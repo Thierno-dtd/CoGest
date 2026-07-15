@@ -1,0 +1,13 @@
+<div class="modal-overlay">
+  <div class="modal-box glass-panel">
+    <h3>Désactiver « {{ objet }} » ?</h3>
+    <p>L'élément sera masqué des listes actives mais son historique restera consultable.</p>
+    <form hx-post="{{ request.path }}" hx-target="#modal-root" method="post">
+      {% csrf_token %}
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="fermerModal()">Annuler</button>
+        <button type="submit" class="btn btn-danger">Désactiver</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}{{ vente.numero }}{% endblock %}
+{% block breadcrumb %}<a href="{% url 'ventes:vente_liste' %}">Ventes</a> · Détail de la vente{% endblock %}
+{% block topbar_actions %}
+{% if vente.facture %}<a href="{% url 'facturation:facture_detail' vente.facture.pk %}" class="btn btn-secondary">Voir la facture</a>{% endif %}
+{% if vente.statut == "VALIDEE" %}
+<button class="btn btn-danger" hx-get="{% url 'ventes:vente_annuler' vente.pk %}" hx-target="#modal-root">Annuler la vente</button>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Montant HT</span><div class="stat-card__value">{{ vente.total_ht_cache|fcfa }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">TVA</span><div class="stat-card__value">{{ vente.total_tva_cache|fcfa }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Montant TTC</span><div class="stat-card__value">{{ vente.total_ttc_cache|fcfa }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Statut</span><div class="stat-card__value" style="font-size:16px;">{{ vente.get_statut_display }}</div></div>
+</div>
+<div class="bento-grid">
+  <div class="bento-item--4 card">
+    <h3 class="section-title">Informations</h3>
+    <div class="info-row"><span>Client</span><span><a href="{% url 'tiers:client_detail' vente.client.pk %}">{{ vente.client.nom_complet }}</a></span></div>
+    <div class="info-row"><span>Date de vente</span><span>{{ vente.date_vente|date:"d/m/Y" }}</span></div>
+    <div class="info-row"><span>Vendu par</span><span>{{ vente.utilisateur.get_full_name|default:vente.utilisateur.username }}</span></div>
+  </div>
+  <div class="bento-item--8 card">
+    <h3 class="section-title">Lignes d'articles</h3>
+    <table class="data-table">
+      <thead><tr><th>Produit</th><th>Qté</th><th>Prix unitaire</th><th>Remise</th><th>Montant TTC</th></tr></thead>
+      <tbody>
+        {% for l in vente.lignes.all %}
+        <tr>
+          <td class="cell-primary">{{ l.produit.designation }}</td>
+          <td>{{ l.quantite_vendue }}</td>
+          <td>{{ l.prix_vente_unitaire_applique|fcfa }}</td>
+          <td>{{ l.remise_pourcentage }}%</td>
+          <td>{{ l.montant_ttc|fcfa }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

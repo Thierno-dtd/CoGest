@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block titre %}Produits — {{ NOM_ENTREPRISE }}{% endblock %}
+{% block page_titre %}Produits{% endblock %}
+{% block breadcrumb %}Catalogue · gestion des articles et du stock{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'produits:produit_creer' %}" class="btn btn-primary">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  Nouveau produit
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card">
+    <div class="stat-card__top"><span class="stat-card__label">Produits actifs</span>
+      <span class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" stroke="currentColor" stroke-width="1.6"/></svg></span>
+    </div>
+    <div class="stat-card__value">{{ stats.actifs }}</div>
+    <div class="stat-card__meta">sur {{ stats.total }} référence{{ stats.total|pluralize }} au total</div>
+  </div>
+  <div class="bento-item stat-card">
+    <div class="stat-card__top"><span class="stat-card__label">Valeur du stock</span>
+      <span class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+    </div>
+    <div class="stat-card__value">{{ stats.valeur_stock|fcfa }}</div>
+    <div class="stat-card__meta">au prix d'achat</div>
+  </div>
+  <div class="bento-item stat-card">
+    <div class="stat-card__top"><span class="stat-card__label">Proches du seuil</span>
+      <span class="stat-card__icon" style="background:var(--cuivre-100); color:var(--cuivre-600);"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9 2.6 18a1.8 1.8 0 0 0 1.6 2.6h15.6a1.8 1.8 0 0 0 1.6-2.6L13.7 3.9a1.8 1.8 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.6"/></svg></span>
+    </div>
+    <div class="stat-card__value">{{ stats.alertes }}</div>
+    <div class="stat-card__meta">article{{ stats.alertes|pluralize }} sous le seuil d'alerte</div>
+  </div>
+  <div class="bento-item stat-card">
+    <div class="stat-card__top"><span class="stat-card__label">En rupture</span>
+      <span class="stat-card__icon" style="background:var(--rouge-100); color:var(--rouge-600);"><svg viewBox="0 0 24 24" fill="none"><path d="M6 18 18 6M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+    </div>
+    <div class="stat-card__value">{{ stats.ruptures }}</div>
+    <div class="stat-card__meta">à réapprovisionner d'urgence</div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher une référence, une désignation…"
+           hx-get="{% url 'produits:produit_liste' %}" hx-trigger="keyup changed delay:350ms, search"
+           hx-target="#produit-table-wrap" hx-include="#filtres-produits" hx-push-url="true">
+    <span class="htmx-indicator"><span class="spinner"></span></span>
+  </div>
+  <div class="filter-chip-group" id="filtres-produits">
+    <select name="categorie" class="filter-select" hx-get="{% url 'produits:produit_liste' %}" hx-trigger="change" hx-target="#produit-table-wrap" hx-include="#filtres-produits, input[name=q]" hx-push-url="true">
+      <option value="">Toutes catégories</option>
+      {% for cat in categories %}<option value="{{ cat.pk }}" {% if categorie_id == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.libelle }}</option>{% endfor %}
+    </select>
+    <select name="statut" class="filter-select" hx-get="{% url 'produits:produit_liste' %}" hx-trigger="change" hx-target="#produit-table-wrap" hx-include="#filtres-produits, input[name=q]" hx-push-url="true">
+      <option value="">Tous statuts</option>
+      <option value="actif" {% if statut == "actif" %}selected{% endif %}>Actifs</option>
+      <option value="inactif" {% if statut == "inactif" %}selected{% endif %}>Inactifs</option>
+      <option value="alerte" {% if statut == "alerte" %}selected{% endif %}>Proches du seuil</option>
+      <option value="rupture" {% if statut == "rupture" %}selected{% endif %}>En rupture</option>
+    </select>
+  </div>
+</div>
+
+<div id="produit-table-wrap">
+  {% include "produits/_produit_table.html" %}
+</div>
+{% endblock %}

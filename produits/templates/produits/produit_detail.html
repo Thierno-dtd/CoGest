@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block titre %}{{ produit.designation }}{% endblock %}
+{% block page_titre %}{{ produit.designation }}{% endblock %}
+{% block breadcrumb %}<a href="{% url 'produits:produit_liste' %}">Produits</a> · Fiche article{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'produits:produit_modifier' produit.pk %}" class="btn btn-secondary">Modifier</a>
+{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Prix de vente</span>
+    <div class="stat-card__value">{{ produit.prix_vente|fcfa }}</div>
+    <div class="stat-card__meta">TVA {{ produit.taux_tva|floatformat:0 }}%… soit {{ produit.taux_tva }} appliqué</div>
+  </div>
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Marge unitaire</span>
+    <div class="stat-card__value">{{ produit.marge_unitaire|fcfa }}</div>
+    <div class="stat-card__meta">{{ produit.marge_pourcentage }}% de marge</div>
+  </div>
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Stock actuel</span>
+    <div class="stat-card__value">{{ produit.quantite_stock }}</div>
+    <div class="stat-card__meta">seuil d'alerte : {{ produit.seuil_alerte }}</div>
+  </div>
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Valeur du stock</span>
+    <div class="stat-card__value">{{ produit.valeur_stock|fcfa }}</div>
+    <div class="stat-card__meta">au prix d'achat</div>
+  </div>
+</div>
+
+<div class="bento-grid">
+  <div class="bento-item--8 card">
+    <h3 class="section-title">Informations générales</h3>
+    <div class="info-row"><span>Référence</span><span>{{ produit.reference }}</span></div>
+    <div class="info-row"><span>Catégorie</span><span>{{ produit.categorie.libelle }}</span></div>
+    <div class="info-row"><span>Prix d'achat</span><span>{{ produit.prix_achat|fcfa }}</span></div>
+    <div class="info-row"><span>Unité de mesure</span><span>{{ produit.get_unite_mesure_display }}</span></div>
+    <div class="info-row"><span>Code-barres</span><span>{{ produit.code_barre|default:"—" }}</span></div>
+    <div class="info-row"><span>Statut</span><span>{% if produit.est_actif %}<span class="badge badge--vert">Actif</span>{% else %}<span class="badge badge--gris">Inactif</span>{% endif %}</span></div>
+    <div class="info-row"><span>Créé le</span><span>{{ produit.date_creation|date:"d/m/Y" }}</span></div>
+
+    <h3 class="section-title" style="margin-top:22px;">Historique des mouvements de stock</h3>
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Type</th><th>Quantité</th><th>Avant → Après</th><th>Document</th></tr></thead>
+      <tbody>
+        {% for m in mouvements %}
+        <tr>
+          <td>{{ m.date_mouvement|date:"d/m/Y H:i" }}</td>
+          <td>{% if m.type_mouvement == "ENTREE" %}<span class="badge badge--vert">Entrée</span>{% elif m.type_mouvement == "SORTIE" %}<span class="badge badge--rouge">Sortie</span>{% else %}<span class="badge badge--bleu">Correction</span>{% endif %}</td>
+          <td>{{ m.quantite }}</td>
+          <td>{{ m.quantite_avant }} → {{ m.quantite_apres }}</td>
+          <td class="cell-muted">{{ m.id_document_origine }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="empty-state"><p>Aucun mouvement pour l'instant.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bento-item--4 card">
+    {% if produit.image %}<img src="{{ produit.image.url }}" style="width:100%;border-radius:14px;margin-bottom:14px;object-fit:cover;max-height:220px;">{% endif %}
+    <h3 class="section-title">Actions</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <a href="{% url 'produits:produit_modifier' produit.pk %}" class="btn btn-secondary">Modifier le produit</a>
+      <button class="btn btn-danger" hx-get="{% url 'produits:produit_supprimer' produit.pk %}" hx-target="#modal-root">Désactiver le produit</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

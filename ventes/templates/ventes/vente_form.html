@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block page_titre %}Nouvelle vente{% endblock %}
+{% block breadcrumb %}<a href="{% url 'ventes:vente_liste' %}">Ventes</a> · Nouvelle transaction{% endblock %}
+{% block content %}
+<form method="post" id="vente-form">
+  {% csrf_token %}
+  <div class="bento-grid">
+    <div class="bento-item--8 card">
+      <h3 class="section-title">Informations générales</h3>
+      <div class="form-grid">
+        <div class="form-field"><label>Client</label>{{ entete_form.client }}</div>
+        <div class="form-field"><label>Date de vente</label>{{ entete_form.date_vente }}</div>
+      </div>
+    </div>
+    <div class="bento-item--4 card">
+      <h3 class="section-title">Résumé</h3>
+      <p class="help-text">La vente diminue automatiquement le stock disponible et génère la facture correspondante.</p>
+      <div id="lignes-vente-total" class="ligne-total-box"><strong>—</strong></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:12px;">Enregistrer la vente</button>
+      <a href="{% url 'ventes:vente_liste' %}" class="btn btn-ghost" style="width:100%;margin-top:8px;">Annuler</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h3 class="section-title">Lignes d'articles</h3>
+    {{ formset.management_form }}
+    <table class="lignes-table">
+      <thead><tr><th style="width:40%;">Produit</th><th style="width:14%;">Quantité</th><th style="width:18%;">Prix de vente unitaire</th><th style="width:14%;">Remise %</th><th style="width:10%;"></th></tr></thead>
+      <tbody id="lignes-vente-body">
+        {% for form in formset %}
+        <tr class="ligne-row">
+          <td>{{ form.produit }}</td>
+          <td>{{ form.quantite }}</td>
+          <td>{{ form.prix_vente_unitaire }}</td>
+          <td>{{ form.remise_pourcentage }}</td>
+          <td><button type="button" class="icon-btn ligne-remove" title="Retirer"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="ajouterLigne('lignes-vente-body', 'form')">+ Ajouter une ligne</button>
+  </div>
+</form>
+
+<template id="lignes-vente-body-template">
+  <tr class="ligne-row">
+    <td>{{ formset.empty_form.produit }}</td>
+    <td>{{ formset.empty_form.quantite }}</td>
+    <td>{{ formset.empty_form.prix_vente_unitaire }}</td>
+    <td>{{ formset.empty_form.remise_pourcentage }}</td>
+    <td><button type="button" class="icon-btn ligne-remove" title="Retirer"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></td>
+  </tr>
+</template>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    initFormsetLignes('lignes-vente-body', 'form');
+    recalculerTotalLignes('lignes-vente-body');
+  });
+</script>
+{% endblock %}

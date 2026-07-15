@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}Ventes{% endblock %}
+{% block breadcrumb %}Flux commerciaux · ventes aux clients{% endblock %}
+{% block topbar_actions %}<a href="{% url 'ventes:vente_creer' %}" class="btn btn-primary">Nouvelle vente</a>{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Chiffre d'affaires du mois</span><div class="stat-card__value">{{ stats.ca_mois|fcfa }}</div><div class="stat-card__meta">{{ stats.nb_mois }} vente{{ stats.nb_mois|pluralize }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Ventes validées</span><div class="stat-card__value">{{ stats.nb_total }}</div><div class="stat-card__meta">historique complet</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Panier moyen</span><div class="stat-card__value">{{ stats.panier_moyen|fcfa }}</div><div class="stat-card__meta">par transaction</div></div>
+</div>
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un numéro, un client…"
+           hx-get="{% url 'ventes:vente_liste' %}" hx-trigger="keyup changed delay:350ms, search" hx-target="#vente-table-wrap" hx-include="#filtres-vente" hx-push-url="true">
+  </div>
+  <div class="filter-chip-group" id="filtres-vente">
+    <select name="statut" class="filter-select" hx-get="{% url 'ventes:vente_liste' %}" hx-trigger="change" hx-target="#vente-table-wrap" hx-include="#filtres-vente, input[name=q]" hx-push-url="true">
+      <option value="">Tous statuts</option>
+      <option value="VALIDEE" {% if statut == "VALIDEE" %}selected{% endif %}>Validée</option>
+      <option value="EN_COURS" {% if statut == "EN_COURS" %}selected{% endif %}>En cours</option>
+      <option value="ANNULEE" {% if statut == "ANNULEE" %}selected{% endif %}>Annulée</option>
+    </select>
+  </div>
+</div>
+<div id="vente-table-wrap">{% include "ventes/_vente_table.html" %}</div>
+{% endblock %}

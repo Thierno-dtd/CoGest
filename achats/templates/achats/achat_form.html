@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block page_titre %}Nouvel achat{% endblock %}
+{% block breadcrumb %}<a href="{% url 'achats:achat_liste' %}">Achats</a> · Nouvelle commande{% endblock %}
+{% block content %}
+<form method="post" id="achat-form">
+  {% csrf_token %}
+  <div class="bento-grid">
+    <div class="bento-item--8 card">
+      <h3 class="section-title">Informations générales</h3>
+      <div class="form-grid">
+        <div class="form-field form-field--full"><label>Fournisseur</label>{{ entete_form.fournisseur }}</div>
+        <div class="form-field"><label>Date d'achat</label>{{ entete_form.date_achat }}</div>
+        <div class="form-field"><label>Livraison prévue (optionnel)</label>{{ entete_form.date_livraison_prevue }}</div>
+        <div class="form-field"><label>Statut de livraison</label>{{ entete_form.statut_livraison }}</div>
+        <div class="form-field form-field--full"><label>Notes</label>{{ entete_form.notes }}</div>
+      </div>
+    </div>
+    <div class="bento-item--4 card">
+      <h3 class="section-title">Résumé</h3>
+      <p class="help-text">Le stock ne sera mis à jour et la facture générée que si le statut de livraison est « Reçue ».</p>
+      <div id="lignes-achat-total" class="ligne-total-box"><strong>—</strong></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:12px;">Enregistrer l'achat</button>
+      <a href="{% url 'achats:achat_liste' %}" class="btn btn-ghost" style="width:100%;margin-top:8px;">Annuler</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h3 class="section-title">Lignes d'articles</h3>
+    {{ formset.management_form }}
+    <table class="lignes-table">
+      <thead><tr><th style="width:45%;">Produit</th><th style="width:15%;">Quantité</th><th style="width:20%;">Prix d'achat unitaire</th><th style="width:10%;"></th></tr></thead>
+      <tbody id="lignes-achat-body">
+        {% for form in formset %}
+        <tr class="ligne-row">
+          <td>{{ form.produit }}</td>
+          <td>{{ form.quantite }}</td>
+          <td>{{ form.prix_achat_unitaire }}</td>
+          <td><button type="button" class="icon-btn ligne-remove" title="Retirer"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="ajouterLigne('lignes-achat-body', 'form')">+ Ajouter une ligne</button>
+  </div>
+</form>
+
+<template id="lignes-achat-body-template">
+  <tr class="ligne-row">
+    <td>{{ formset.empty_form.produit }}</td>
+    <td>{{ formset.empty_form.quantite }}</td>
+    <td>{{ formset.empty_form.prix_achat_unitaire }}</td>
+    <td><button type="button" class="icon-btn ligne-remove" title="Retirer"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></td>
+  </tr>
+</template>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    initFormsetLignes('lignes-achat-body', 'form');
+    recalculerTotalLignes('lignes-achat-body');
+  });
+</script>
+{% endblock %}

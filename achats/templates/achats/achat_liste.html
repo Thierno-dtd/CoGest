@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}Achats{% endblock %}
+{% block breadcrumb %}Flux commerciaux · commandes fournisseurs{% endblock %}
+{% block topbar_actions %}<a href="{% url 'achats:achat_creer' %}" class="btn btn-primary">Nouvel achat</a>{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Achats du mois</span><div class="stat-card__value">{{ stats.total_mois|fcfa }}</div><div class="stat-card__meta">{{ stats.nb_mois }} commande{{ stats.nb_mois|pluralize }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Total historique</span><div class="stat-card__value">{{ stats.nb_total }}</div><div class="stat-card__meta">commandes enregistrées</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">En attente</span><div class="stat-card__value">{{ stats.en_attente }}</div><div class="stat-card__meta">livraisons à suivre</div></div>
+</div>
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un numéro, un fournisseur…"
+           hx-get="{% url 'achats:achat_liste' %}" hx-trigger="keyup changed delay:350ms, search" hx-target="#achat-table-wrap" hx-include="#filtres-achat" hx-push-url="true">
+  </div>
+  <div class="filter-chip-group" id="filtres-achat">
+    <select name="statut" class="filter-select" hx-get="{% url 'achats:achat_liste' %}" hx-trigger="change" hx-target="#achat-table-wrap" hx-include="#filtres-achat, input[name=q]" hx-push-url="true">
+      <option value="">Tous statuts</option>
+      <option value="ATTENTE" {% if statut == "ATTENTE" %}selected{% endif %}>En attente</option>
+      <option value="PARTIELLE" {% if statut == "PARTIELLE" %}selected{% endif %}>Partielle</option>
+      <option value="RECUE" {% if statut == "RECUE" %}selected{% endif %}>Reçue</option>
+      <option value="ANNULEE" {% if statut == "ANNULEE" %}selected{% endif %}>Annulée</option>
+    </select>
+  </div>
+</div>
+<div id="achat-table-wrap">{% include "achats/_achat_table.html" %}</div>
+{% endblock %}

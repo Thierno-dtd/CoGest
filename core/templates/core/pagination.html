@@ -1,0 +1,39 @@
+{% load core_extras %}
+{% if page_obj.paginator.num_pages > 1 or page_obj.paginator.count > 0 %}
+<div class="pagination-bar">
+  <div class="pagination-bar__info">
+    Affichage <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong> sur <strong>{{ page_obj.paginator.count }}</strong> résultat{{ page_obj.paginator.count|pluralize }}
+  </div>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav class="pagination-nav">
+    {% if page_obj.has_previous %}
+    <a href="?{% querystring_replace page=page_obj.previous_page_number %}"
+       {% if hx_target %}hx-get="?{% querystring_replace page=page_obj.previous_page_number %}" hx-target="{{ hx_target }}" hx-push-url="true"{% endif %}
+       class="page-btn" aria-label="Page précédente">‹</a>
+    {% else %}
+    <span class="page-btn page-btn--disabled">‹</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <span class="page-btn page-btn--active">{{ num }}</span>
+      {% elif num == 1 or num == page_obj.paginator.num_pages or num|add:'-1' == page_obj.number or num|add:'1' == page_obj.number %}
+        <a href="?{% querystring_replace page=num %}"
+           {% if hx_target %}hx-get="?{% querystring_replace page=num %}" hx-target="{{ hx_target }}" hx-push-url="true"{% endif %}
+           class="page-btn">{{ num }}</a>
+      {% elif num == 2 or num == page_obj.paginator.num_pages|add:'-1' %}
+        <span class="page-dots">…</span>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a href="?{% querystring_replace page=page_obj.next_page_number %}"
+       {% if hx_target %}hx-get="?{% querystring_replace page=page_obj.next_page_number %}" hx-target="{{ hx_target }}" hx-push-url="true"{% endif %}
+       class="page-btn" aria-label="Page suivante">›</a>
+    {% else %}
+    <span class="page-btn page-btn--disabled">›</span>
+    {% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endif %}

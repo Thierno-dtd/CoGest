@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block page_titre %}{{ titre }}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:760px;">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+      <div class="form-field form-field--full"><label>Raison sociale</label>{{ form.raison_sociale }}</div>
+      <div class="form-field"><label>Contact principal</label>{{ form.contact_principal }}</div>
+      <div class="form-field"><label>Délai de livraison moyen (jours)</label>{{ form.delai_livraison_moyen_jours }}</div>
+      <div class="form-field"><label>Téléphone</label>{{ form.telephone }}</div>
+      <div class="form-field"><label>Email</label>{{ form.email }}</div>
+      <div class="form-field form-field--full"><label>Adresse</label>{{ form.adresse }}</div>
+      <div class="form-field form-field--full switch-row">{{ form.est_actif }}<label>Fournisseur actif</label></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="{% url 'tiers:fournisseur_liste' %}" class="btn btn-ghost">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}Clients{% endblock %}
+{% block breadcrumb %}Tiers · portefeuille clients{% endblock %}
+{% block topbar_actions %}<a href="{% url 'tiers:client_creer' %}" class="btn btn-primary">Nouveau client</a>{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Clients actifs</span><div class="stat-card__value">{{ stats.actifs }}</div><div class="stat-card__meta">sur {{ stats.total }} enregistré{{ stats.total|pluralize }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Nouveaux (30 j)</span><div class="stat-card__value">{{ stats.nouveaux_30j }}</div><div class="stat-card__meta">inscriptions récentes</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Comptes entreprise</span><div class="stat-card__value">{{ stats.entreprises }}</div><div class="stat-card__meta">clients B2B</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Total</span><div class="stat-card__value">{{ stats.total }}</div><div class="stat-card__meta">tous statuts confondus</div></div>
+</div>
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un client (nom, téléphone, email)…"
+           hx-get="{% url 'tiers:client_liste' %}" hx-trigger="keyup changed delay:350ms, search" hx-target="#client-table-wrap" hx-include="#filtres-client" hx-push-url="true">
+  </div>
+  <div class="filter-chip-group" id="filtres-client">
+    <select name="type" class="filter-select" hx-get="{% url 'tiers:client_liste' %}" hx-trigger="change" hx-target="#client-table-wrap" hx-include="#filtres-client, input[name=q]" hx-push-url="true">
+      <option value="">Tous types</option>
+      <option value="PARTICULIER" {% if type_client == "PARTICULIER" %}selected{% endif %}>Particulier</option>
+      <option value="ENTREPRISE" {% if type_client == "ENTREPRISE" %}selected{% endif %}>Entreprise</option>
+    </select>
+  </div>
+</div>
+<div id="client-table-wrap">{% include "tiers/_client_table.html" %}</div>
+{% endblock %}

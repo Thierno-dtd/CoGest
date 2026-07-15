@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}Factures &amp; règlements{% endblock %}
+{% block breadcrumb %}Suivi des créances, dettes et encaissements{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Créances clients</span><div class="stat-card__value">{{ stats.creances_clients|fcfa }}</div><div class="stat-card__meta">restant à encaisser</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Dettes fournisseurs</span><div class="stat-card__value">{{ stats.dettes_fournisseurs|fcfa }}</div><div class="stat-card__meta">restant à payer</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Total encaissé</span><div class="stat-card__value">{{ stats.encaisse|fcfa }}</div><div class="stat-card__meta">ventes réglées</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Factures en retard</span><div class="stat-card__value">{{ stats.nb_retard }}</div><div class="stat-card__meta">échéance dépassée</div></div>
+</div>
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un numéro, un tiers…"
+           hx-get="{% url 'facturation:facture_liste' %}" hx-trigger="keyup changed delay:350ms, search" hx-target="#facture-table-wrap" hx-include="#filtres-facture" hx-push-url="true">
+  </div>
+  <div class="filter-chip-group" id="filtres-facture">
+    <select name="type" class="filter-select" hx-get="{% url 'facturation:facture_liste' %}" hx-trigger="change" hx-target="#facture-table-wrap" hx-include="#filtres-facture, input[name=q]" hx-push-url="true">
+      <option value="">Achats &amp; ventes</option>
+      <option value="VENTE" {% if type_facture == "VENTE" %}selected{% endif %}>Ventes</option>
+      <option value="ACHAT" {% if type_facture == "ACHAT" %}selected{% endif %}>Achats</option>
+    </select>
+    <select name="etat" class="filter-select" hx-get="{% url 'facturation:facture_liste' %}" hx-trigger="change" hx-target="#facture-table-wrap" hx-include="#filtres-facture, input[name=q]" hx-push-url="true">
+      <option value="">Tous états</option>
+      <option value="soldee" {% if etat == "soldee" %}selected{% endif %}>Soldées</option>
+      <option value="non_soldee" {% if etat == "non_soldee" %}selected{% endif %}>Non soldées</option>
+      <option value="retard" {% if etat == "retard" %}selected{% endif %}>En retard</option>
+    </select>
+  </div>
+</div>
+<div id="facture-table-wrap">{% include "facturation/_facture_table.html" %}</div>
+{% endblock %}

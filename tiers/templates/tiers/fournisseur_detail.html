@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}{{ fournisseur.raison_sociale }}{% endblock %}
+{% block breadcrumb %}<a href="{% url 'tiers:fournisseur_liste' %}">Fournisseurs</a> · Fiche fournisseur{% endblock %}
+{% block topbar_actions %}<a href="{% url 'tiers:fournisseur_modifier' fournisseur.pk %}" class="btn btn-secondary">Modifier</a>{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Total achats</span><div class="stat-card__value">{{ fournisseur.montant_total_achats|fcfa }}</div><div class="stat-card__meta">{{ fournisseur.nb_achats }} commande{{ fournisseur.nb_achats|pluralize }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Dette fournisseur</span><div class="stat-card__value">{{ fournisseur.dette_fournisseur|fcfa }}</div><div class="stat-card__meta">factures non soldées</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Délai de livraison</span><div class="stat-card__value">{{ fournisseur.delai_livraison_moyen_jours }} j</div><div class="stat-card__meta">moyenne observée</div></div>
+</div>
+<div class="bento-grid">
+  <div class="bento-item--4 card">
+    <div class="detail-header__id" style="margin-bottom:16px;">
+      <span class="detail-header__avatar">{{ fournisseur.initiales }}</span>
+      <strong style="font-size:16px;">{{ fournisseur.raison_sociale }}</strong>
+    </div>
+    <div class="info-row"><span>Contact</span><span>{{ fournisseur.contact_principal|default:"—" }}</span></div>
+    <div class="info-row"><span>Téléphone</span><span>{{ fournisseur.telephone|default:"—" }}</span></div>
+    <div class="info-row"><span>Email</span><span>{{ fournisseur.email|default:"—" }}</span></div>
+    <div class="info-row"><span>Adresse</span><span>{{ fournisseur.adresse|default:"—" }}</span></div>
+    <button class="btn btn-danger" style="margin-top:16px;width:100%;" hx-get="{% url 'tiers:fournisseur_supprimer' fournisseur.pk %}" hx-target="#modal-root">Désactiver ce fournisseur</button>
+  </div>
+  <div class="bento-item--8 card">
+    <h3 class="section-title">Historique de livraisons récentes</h3>
+    <table class="data-table">
+      <thead><tr><th>N° achat</th><th>Date</th><th>Statut</th><th>Montant TTC</th></tr></thead>
+      <tbody>
+        {% for a in achats %}
+        <tr>
+          <td class="cell-primary"><a href="{% url 'achats:achat_detail' a.pk %}">{{ a.numero }}</a></td>
+          <td>{{ a.date_achat|date:"d/m/Y" }}</td>
+          <td><span class="badge badge--bleu">{{ a.get_statut_livraison_display }}</span></td>
+          <td>{{ a.total_ttc_cache|fcfa }}</td>
+        </tr>
+        {% empty %}<tr><td colspan="4"><div class="empty-state"><p>Aucune livraison pour l'instant.</p></div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

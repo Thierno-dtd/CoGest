@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}Mouvements de stock{% endblock %}
+{% block breadcrumb %}Traçabilité complète des entrées / sorties{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Valeur du stock</span><div class="stat-card__value">{{ stats.valeur_totale|fcfa }}</div><div class="stat-card__meta">au prix d'achat</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Quantité totale</span><div class="stat-card__value">{{ stats.qte_totale }}</div><div class="stat-card__meta">unités en stock</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Entrées enregistrées</span><div class="stat-card__value">{{ stats.entrees_total }}</div><div class="stat-card__meta">mouvements d'achat</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Sorties enregistrées</span><div class="stat-card__value">{{ stats.sorties_total }}</div><div class="stat-card__meta">mouvements de vente</div></div>
+</div>
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un produit, un document…"
+           hx-get="{% url 'stock:mouvement_liste' %}" hx-trigger="keyup changed delay:350ms, search" hx-target="#mouvement-table-wrap" hx-include="#filtres-mouvement" hx-push-url="true">
+  </div>
+  <div class="filter-chip-group" id="filtres-mouvement">
+    <select name="type" class="filter-select" hx-get="{% url 'stock:mouvement_liste' %}" hx-trigger="change" hx-target="#mouvement-table-wrap" hx-include="#filtres-mouvement, input[name=q]" hx-push-url="true">
+      <option value="">Tous les mouvements</option>
+      <option value="ENTREE" {% if type_mouvement == "ENTREE" %}selected{% endif %}>Entrées (achats)</option>
+      <option value="SORTIE" {% if type_mouvement == "SORTIE" %}selected{% endif %}>Sorties (ventes)</option>
+      <option value="CORRECTION" {% if type_mouvement == "CORRECTION" %}selected{% endif %}>Corrections</option>
+    </select>
+  </div>
+</div>
+<div id="mouvement-table-wrap">{% include "stock/_mouvement_table.html" %}</div>
+{% endblock %}

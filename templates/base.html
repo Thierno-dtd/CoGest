@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" x-data="{ sidebarOpen: false }" :class="{ 'sidebar-open': sidebarOpen }">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block titre %}{{ NOM_ENTREPRISE }}{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.12/htmx.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.3/chart.umd.min.js"></script>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" :class="{ 'sidebar--open': sidebarOpen }">
+    <div class="sidebar__brand">
+      <span class="sidebar__mark">GC</span>
+      <div class="sidebar__brand-text">
+        <strong>Gestion</strong>
+        <span>Commerciale</span>
+      </div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <p class="sidebar__section">Pilotage</p>
+      <a href="{% url 'dashboard:accueil' %}" class="nav-link {% if request.resolver_match.url_name == 'accueil' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6V11h-6v9Zm0-16v5h6V4h-6Z" fill="currentColor"/></svg>
+        Tableau de bord
+      </a>
+
+      <p class="sidebar__section">Catalogue</p>
+      <a href="{% url 'produits:produit_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'produits' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 8l9 5 9-5M12 13v8" stroke="currentColor" stroke-width="1.6"/></svg>
+        Produits
+      </a>
+      <a href="{% url 'produits:categorie_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'categorie_liste' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Catégories
+      </a>
+      <a href="{% url 'stock:mouvement_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'stock' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Mouvements de stock
+      </a>
+
+      <p class="sidebar__section">Tiers</p>
+      <a href="{% url 'tiers:client_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'client_liste' or request.resolver_match.url_name == 'client_detail' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c0-3.5 3.2-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Clients
+      </a>
+      <a href="{% url 'tiers:fournisseur_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'fournisseur_liste' or request.resolver_match.url_name == 'fournisseur_detail' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 21V9l9-5 9 5v12" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 21v-6h6v6" stroke="currentColor" stroke-width="1.6"/></svg>
+        Fournisseurs
+      </a>
+
+      <p class="sidebar__section">Flux commerciaux</p>
+      <a href="{% url 'achats:achat_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'achats' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 4h2l2 12h11l2-8H7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.4" fill="currentColor"/><circle cx="17" cy="20" r="1.4" fill="currentColor"/></svg>
+        Achats
+      </a>
+      <a href="{% url 'ventes:vente_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'ventes' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.6 12.6a2 2 0 0 0 2 1.6h7a2 2 0 0 0 2-1.6L21 8H6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        Ventes
+      </a>
+      <a href="{% url 'facturation:facture_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'facturation' %}nav-link--active{% endif %}">
+        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M7 3h8l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 11h6M10 15h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Factures &amp; règlements
+      </a>
+    </nav>
+
+    <div class="sidebar__footer">
+      <p>Connecté en tant que</p>
+      <strong>{{ request.user.get_role_display }}</strong>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" @click="sidebarOpen = false" :class="{ 'is-visible': sidebarOpen }"></div>
+
+  <div class="main-col">
+    <header class="topbar">
+      <button class="icon-btn topbar__burger" @click="sidebarOpen = !sidebarOpen" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <div class="topbar__title">
+        <h1>{% block page_titre %}Tableau de bord{% endblock %}</h1>
+        <p class="topbar__breadcrumb">{% block breadcrumb %}Vue d'ensemble de l'activité{% endblock %}</p>
+      </div>
+      <div class="topbar__actions">
+        {% block topbar_actions %}{% endblock %}
+        <div class="user-menu" x-data="{ open: false }">
+          <button class="user-menu__trigger" @click="open = !open" @click.outside="open = false">
+            {% if request.user.avatar %}
+              <img src="{{ request.user.avatar.url }}" class="avatar-img" alt="">
+            {% else %}
+              <span class="avatar-circle">{{ request.user.initiales }}</span>
+            {% endif %}
+          </button>
+          <div class="user-menu__panel glass-panel" x-show="open" x-transition x-cloak>
+            <div class="user-menu__id">
+              <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+              <span>{{ request.user.get_role_display }}</span>
+            </div>
+            <a href="{% url 'accounts:profil' %}">Mon profil</a>
+            <a href="{% url 'accounts:profil_modifier' %}">Modifier mes informations</a>
+            <a href="{% url 'accounts:mot_de_passe_modifier' %}">Changer mon mot de passe</a>
+            {% if request.user.is_superuser %}<a href="/admin/">Administration Django</a>{% endif %}
+            <form method="post" action="{% url 'accounts:deconnexion' %}">
+              {% csrf_token %}
+              <button type="submit" class="user-menu__logout">Se déconnecter</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="toast-stack" id="toast-stack">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="toast toast--{{ message.tags }}" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4500)" x-transition>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<script src="{% static 'js/app.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}{{ facture.numero }}{% endblock %}
+{% block breadcrumb %}<a href="{% url 'facturation:facture_liste' %}">Factures</a> · Détail{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'facturation:facture_pdf' facture.pk %}" target="_blank" class="btn btn-secondary">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h8l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  Exporter en PDF
+</a>
+{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Montant TTC</span><div class="stat-card__value">{{ facture.montant_ttc|fcfa }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Montant payé</span><div class="stat-card__value">{{ facture.montant_paye|fcfa }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Solde restant</span><div class="stat-card__value">{{ facture.solde_restant|fcfa }}</div></div>
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Statut</span>
+    <div class="stat-card__value" style="font-size:16px;">
+      {% if facture.est_soldee %}<span class="badge badge--vert">Soldée</span>
+      {% elif facture.est_en_retard %}<span class="badge badge--rouge">En retard</span>
+      {% else %}<span class="badge badge--cuivre">En cours</span>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:16px;">
+  <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--graphite-400);margin-bottom:8px;">
+    <span>Progression du règlement</span><span>{{ facture.pourcentage_paye }}%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill {% if facture.pourcentage_paye == 0 %}progress-fill--empty{% elif facture.pourcentage_paye < 100 %}progress-fill--partial{% endif %}" style="width:{{ facture.pourcentage_paye }}%;"></div>
+  </div>
+</div>
+
+<div class="bento-grid">
+  <div class="bento-item--8 card">
+    <h3 class="section-title">Lignes de la facture</h3>
+    <table class="data-table">
+      <thead><tr><th>Désignation</th><th>Qté</th><th>Prix unitaire</th><th>TVA</th><th>Montant TTC</th></tr></thead>
+      <tbody>
+        {% for l in facture.lignes %}
+        <tr>
+          <td class="cell-primary">{{ l.produit.designation }}</td>
+          <td>{{ l.quantite_achetee|default:l.quantite_vendue }}</td>
+          <td>{{ l.prix_achat_unitaire_applique|default:l.prix_vente_unitaire_applique|fcfa }}</td>
+          <td>{{ l.taux_tva_applique|floatformat:2 }}</td>
+          <td>{{ l.montant_ttc|fcfa }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3 class="section-title" style="margin-top:22px;">Règlements enregistrés</h3>
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Montant</th><th>Mode</th><th>Référence</th></tr></thead>
+      <tbody>
+        {% for r in facture.reglements.all %}
+        <tr>
+          <td>{{ r.date_paiement|date:"d/m/Y" }}</td>
+          <td class="cell-primary">{{ r.montant_verse|fcfa }}</td>
+          <td>{{ r.get_mode_paiement_display }}</td>
+          <td class="cell-muted">{{ r.numero_transaction|default:"—" }}</td>
+        </tr>
+        {% empty %}<tr><td colspan="4"><div class="empty-state"><p>Aucun règlement enregistré.</p></div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bento-item--4 card">
+    <h3 class="section-title">Informations</h3>
+    <div class="info-row"><span>Type</span><span>{{ facture.get_type_facture_display }}</span></div>
+    <div class="info-row"><span>Tiers</span><span>{{ facture.tiers }}</span></div>
+    <div class="info-row"><span>Date de facturation</span><span>{{ facture.date_facturation|date:"d/m/Y" }}</span></div>
+    <div class="info-row"><span>Échéance</span><span>{{ facture.date_echeance|date:"d/m/Y" }}</span></div>
+
+    {% if not facture.est_soldee %}
+    <h3 class="section-title" style="margin-top:20px;">Enregistrer un règlement</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-field" style="margin-bottom:12px;"><label>Date du paiement</label>{{ form.date_paiement }}</div>
+      <div class="form-field" style="margin-bottom:12px;"><label>Montant versé</label>{{ form.montant_verse }}</div>
+      <div class="form-field" style="margin-bottom:12px;"><label>Mode de paiement</label>{{ form.mode_paiement }}</div>
+      <div class="form-field" style="margin-bottom:12px;"><label>N° transaction (optionnel)</label>{{ form.numero_transaction }}</div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Enregistrer le règlement</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

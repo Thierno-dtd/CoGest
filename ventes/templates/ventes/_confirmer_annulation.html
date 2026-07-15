@@ -1,0 +1,13 @@
+<div class="modal-overlay">
+  <div class="modal-box glass-panel">
+    <h3>Annuler la vente {{ vente.numero }} ?</h3>
+    <p>Le stock vendu sera restitué automatiquement et la vente sera marquée comme annulée. Cette action est irréversible.</p>
+    <form hx-post="{{ request.path }}" method="post">
+      {% csrf_token %}
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="fermerModal()">Retour</button>
+        <button type="submit" class="btn btn-danger">Confirmer l'annulation</button>
+      </div>
+    </form>
+  </div>
+</div>

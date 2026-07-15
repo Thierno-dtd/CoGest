@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block titre %}Tableau de bord — {{ NOM_ENTREPRISE }}{% endblock %}
+{% block page_titre %}Tableau de bord{% endblock %}
+{% block breadcrumb %}Vue d'ensemble de l'activité commerciale{% endblock %}
+{% block topbar_actions %}
+<button class="btn btn-secondary no-print" onclick="exporterDashboardPDF()">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h8l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 11h6M10 15h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+  Exporter l'état actuel en PDF
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item--4 stat-card">
+    <div class="stat-card__top">
+      <span class="stat-card__label">Chiffre d'affaires du mois</span>
+      <span class="stat-card__delta {% if kpis.evolution_ca >= 0 %}stat-card__delta--up{% else %}stat-card__delta--down{% endif %}">
+        {% if kpis.evolution_ca >= 0 %}+{% endif %}{{ kpis.evolution_ca }}%
+      </span>
+    </div>
+    <div class="stat-card__value">{{ kpis.ca_mois|fcfa }}</div>
+    <div class="stat-card__meta">{{ kpis.nb_ventes_mois }} vente{{ kpis.nb_ventes_mois|pluralize }} ce mois-ci</div>
+  </div>
+  <div class="bento-item--4 stat-card">
+    <span class="stat-card__label">Achats du mois</span>
+    <div class="stat-card__value">{{ kpis.achats_mois|fcfa }}</div>
+    <div class="stat-card__meta">montant total engagé</div>
+  </div>
+  <div class="bento-item--4 stat-card">
+    <span class="stat-card__label">Valeur du stock</span>
+    <div class="stat-card__value">{{ kpis.valeur_stock|fcfa }}</div>
+    <div class="stat-card__meta">{{ kpis.ruptures }} rupture{{ kpis.ruptures|pluralize }} · {{ kpis.alertes }} alerte{{ kpis.alertes|pluralize }}</div>
+  </div>
+
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Créances clients</span>
+    <div class="stat-card__value" style="font-size:20px;">{{ kpis.creances_clients|fcfa }}</div>
+  </div>
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Dettes fournisseurs</span>
+    <div class="stat-card__value" style="font-size:20px;">{{ kpis.dettes_fournisseurs|fcfa }}</div>
+  </div>
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Clients actifs</span>
+    <div class="stat-card__value" style="font-size:20px;">{{ kpis.nb_clients }}</div>
+  </div>
+  <div class="bento-item stat-card">
+    <span class="stat-card__label">Produits actifs</span>
+    <div class="stat-card__value" style="font-size:20px;">{{ kpis.nb_produits }}</div>
+  </div>
+</div>
+
+<div class="bento-grid">
+  <div class="bento-item--8 card chart-card">
+    <div class="chart-card__header">
+      <div><h3 class="chart-card__title">Évolution ventes &amp; achats</h3><p class="chart-card__subtitle">Comparaison des flux financiers dans le temps</p></div>
+      <select class="chip-select no-print" id="filtre-periode-va" onchange="chargerVentesAchats(this.value)">
+        <option value="7j">7 derniers jours</option>
+        <option value="30j" selected>30 derniers jours</option>
+        <option value="90j">90 derniers jours</option>
+        <option value="12m">12 derniers mois</option>
+      </select>
+    </div>
+    <div class="chart-card__canvas-wrap"><canvas id="chart-ventes-achats"></canvas></div>
+  </div>
+
+  <div class="bento-item--4 card chart-card">
+    <div class="chart-card__header">
+      <div><h3 class="chart-card__title">Stock par catégorie</h3><p class="chart-card__subtitle">Valeur immobilisée</p></div>
+    </div>
+    <div class="chart-card__canvas-wrap"><canvas id="chart-categories"></canvas></div>
+  </div>
+
+  <div class="bento-item--6 card chart-card">
+    <div class="chart-card__header">
+      <div><h3 class="chart-card__title">Produits</h3><p class="chart-card__subtitle">Classement sur la période</p></div>
+      <select class="chip-select no-print" id="filtre-critere-produits" onchange="chargerTopProduits()">
+        <option value="quantite">Les plus vendus</option>
+        <option value="rentabilite">Les plus rentables</option>
+        <option value="moins_vendus">Les moins vendus</option>
+      </select>
+    </div>
+    <div class="chart-card__canvas-wrap"><canvas id="chart-produits"></canvas></div>
+  </div>
+
+  <div class="bento-item--6 card chart-card">
+    <div class="chart-card__header">
+      <div><h3 class="chart-card__title">Clients les plus fidèles</h3><p class="chart-card__subtitle">Classement sur l'historique complet</p></div>
+      <select class="chip-select no-print" id="filtre-critere-clients" onchange="chargerClientsFideles()">
+        <option value="nb_achats">Par nombre d'achats</option>
+        <option value="chiffre_affaires">Par chiffre d'affaires</option>
+      </select>
+    </div>
+    <div class="chart-card__canvas-wrap"><canvas id="chart-clients"></canvas></div>
+  </div>
+
+  <div class="bento-item--full card chart-card">
+    <div class="chart-card__header">
+      <div><h3 class="chart-card__title">Fournisseurs les plus sollicités</h3><p class="chart-card__subtitle">Nombre de commandes passées</p></div>
+    </div>
+    <div class="chart-card__canvas-wrap" style="min-height:220px;"><canvas id="chart-fournisseurs"></canvas></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const PALETTE = ['#B4602E', '#1C1A17', '#3E7A52', '#35618A', '#D48145', '#7C766B', '#984E23', '#A83D33'];
+Chart.defaults.font.family = "'Manrope', sans-serif";
+Chart.defaults.color = '#514C44';
+
+let chartVentesAchats, chartCategories, chartProduits, chartClients, chartFournisseurs;
+
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  return res.json();
+}
+
+async function chargerVentesAchats(periode) {
+  periode = periode || document.getElementById('filtre-periode-va').value;
+  const data = await fetchJSON(`{% url 'dashboard:api_ventes_achats' %}?periode=${periode}`);
+  const ctx = document.getElementById('chart-ventes-achats');
+  if (chartVentesAchats) chartVentesAchats.destroy();
+  chartVentesAchats = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [
+        { label: 'Ventes', data: data.ventes, borderColor: '#B4602E', backgroundColor: 'rgba(180,96,46,0.12)', fill: true, tension: 0.35, pointRadius: 2 },
+        { label: 'Achats', data: data.achats, borderColor: '#1C1A17', backgroundColor: 'rgba(28,26,23,0.06)', fill: true, tension: 0.35, pointRadius: 2 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+  });
+}
+
+async function chargerCategories() {
+  const data = await fetchJSON(`{% url 'dashboard:api_repartition_categories' %}`);
+  const ctx = document.getElementById('chart-categories');
+  if (chartCategories) chartCategories.destroy();
+  chartCategories = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: data.labels, datasets: [{ data: data.valeurs, backgroundColor: PALETTE }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } } }
+  });
+}
+
+async function chargerTopProduits() {
+  const critere = document.getElementById('filtre-critere-produits').value;
+  const periode = document.getElementById('filtre-periode-va') ? document.getElementById('filtre-periode-va').value : '30j';
+  const data = await fetchJSON(`{% url 'dashboard:api_top_produits' %}?critere=${critere}&periode=${periode}`);
+  const ctx = document.getElementById('chart-produits');
+  if (chartProduits) chartProduits.destroy();
+  chartProduits = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: data.labels, datasets: [{ label: 'Valeur', data: data.valeurs, backgroundColor: '#B4602E', borderRadius: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, indexAxis: 'y' }
+  });
+}
+
+async function chargerClientsFideles() {
+  const critere = document.getElementById('filtre-critere-clients').value;
+  const data = await fetchJSON(`{% url 'dashboard:api_clients_fideles' %}?critere=${critere}`);
+  const ctx = document.getElementById('chart-clients');
+  if (chartClients) chartClients.destroy();
+  chartClients = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: data.labels, datasets: [{ label: 'Valeur', data: data.valeurs, backgroundColor: '#35618A', borderRadius: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, indexAxis: 'y' }
+  });
+}
+
+async function chargerFournisseurs() {
+  const data = await fetchJSON(`{% url 'dashboard:api_fournisseurs_sollicites' %}`);
+  const ctx = document.getElementById('chart-fournisseurs');
+  if (chartFournisseurs) chartFournisseurs.destroy();
+  chartFournisseurs = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: data.labels, datasets: [{ label: 'Commandes', data: data.valeurs, backgroundColor: '#3E7A52', borderRadius: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  chargerVentesAchats('30j');
+  chargerCategories();
+  chargerTopProduits();
+  chargerClientsFideles();
+  chargerFournisseurs();
+});
+</script>
+{% endblock %}

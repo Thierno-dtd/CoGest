@@ -1,0 +1,24 @@
+{% load core_extras %}
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>Client</th><th>Type</th><th>Téléphone</th><th>Email</th><th>Statut</th><th></th></tr></thead>
+    <tbody>
+      {% for client in page_obj %}
+      <tr>
+        <td class="cell-primary"><a href="{% url 'tiers:client_detail' client.pk %}">{{ client.nom_complet }}</a></td>
+        <td>{{ client.get_type_client_display }}</td>
+        <td class="cell-muted">{{ client.telephone|default:"—" }}</td>
+        <td class="cell-muted">{{ client.email|default:"—" }}</td>
+        <td>{% if client.est_actif %}<span class="badge badge--vert">Actif</span>{% else %}<span class="badge badge--gris">Inactif</span>{% endif %}</td>
+        <td>
+          <div class="row-actions">
+            <a class="icon-btn" href="{% url 'tiers:client_modifier' client.pk %}" title="Modifier"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></a>
+            <button class="icon-btn" title="Désactiver" hx-get="{% url 'tiers:client_supprimer' client.pk %}" hx-target="#modal-root"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="6"><div class="empty-state"><p>Aucun client trouvé.</p></div></td></tr>{% endfor %}
+    </tbody>
+  </table>
+  {% include "core/pagination.html" with hx_target="#client-table-wrap" %}
+</div>

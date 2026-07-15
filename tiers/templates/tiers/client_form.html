@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block page_titre %}{{ titre }}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:760px;" x-data="{ typeClient: '{{ form.type_client.value|default:'PARTICULIER' }}' }">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+      <div class="form-field"><label>Type de client</label>{{ form.type_client }}</div>
+      <div class="form-field"><label>Plafond de crédit (FCFA)</label>{{ form.plafond_credit }}</div>
+      <div class="form-field"><label x-text="typeClient === 'ENTREPRISE' ? 'Raison sociale' : 'Nom'">Nom</label>{{ form.nom }}</div>
+      <div class="form-field" x-show="typeClient !== 'ENTREPRISE'"><label>Prénom</label>{{ form.prenom }}</div>
+      <div class="form-field"><label>Téléphone</label>{{ form.telephone }}</div>
+      <div class="form-field"><label>Email</label>{{ form.email }}</div>
+      <div class="form-field form-field--full"><label>Adresse</label>{{ form.adresse }}</div>
+      <div class="form-field form-field--full switch-row">{{ form.est_actif }}<label>Client actif</label></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="{% url 'tiers:client_liste' %}" class="btn btn-ghost">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block page_titre %}{{ achat.numero }}{% endblock %}
+{% block breadcrumb %}<a href="{% url 'achats:achat_liste' %}">Achats</a> · Détail de la commande{% endblock %}
+{% block topbar_actions %}
+{% if achat.facture %}<a href="{% url 'facturation:facture_detail' achat.facture.pk %}" class="btn btn-secondary">Voir la facture</a>{% endif %}
+{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item stat-card"><span class="stat-card__label">Montant HT</span><div class="stat-card__value">{{ achat.total_ht_cache|fcfa }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">TVA</span><div class="stat-card__value">{{ achat.total_tva_cache|fcfa }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Montant TTC</span><div class="stat-card__value">{{ achat.total_ttc_cache|fcfa }}</div></div>
+  <div class="bento-item stat-card"><span class="stat-card__label">Statut livraison</span><div class="stat-card__value" style="font-size:16px;">{{ achat.get_statut_livraison_display }}</div></div>
+</div>
+<div class="bento-grid">
+  <div class="bento-item--4 card">
+    <h3 class="section-title">Informations</h3>
+    <div class="info-row"><span>Fournisseur</span><span><a href="{% url 'tiers:fournisseur_detail' achat.fournisseur.pk %}">{{ achat.fournisseur.raison_sociale }}</a></span></div>
+    <div class="info-row"><span>Date d'achat</span><span>{{ achat.date_achat|date:"d/m/Y" }}</span></div>
+    <div class="info-row"><span>Livraison prévue</span><span>{{ achat.date_livraison_prevue|date:"d/m/Y"|default:"—" }}</span></div>
+    <div class="info-row"><span>Saisi par</span><span>{{ achat.utilisateur.get_full_name|default:achat.utilisateur.username }}</span></div>
+    {% if achat.notes %}<div class="info-row"><span>Notes</span><span>{{ achat.notes }}</span></div>{% endif %}
+  </div>
+  <div class="bento-item--8 card">
+    <h3 class="section-title">Lignes d'articles</h3>
+    <table class="data-table">
+      <thead><tr><th>Produit</th><th>Qté</th><th>Prix unitaire</th><th>TVA</th><th>Montant TTC</th></tr></thead>
+      <tbody>
+        {% for l in achat.lignes.all %}
+        <tr>
+          <td class="cell-primary">{{ l.produit.designation }}</td>
+          <td>{{ l.quantite_achetee }}</td>
+          <td>{{ l.prix_achat_unitaire_applique|fcfa }}</td>
+          <td>{{ l.taux_tva_applique|floatformat:2 }}</td>
+          <td>{{ l.montant_ttc|fcfa }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block page_titre %}Mon profil{% endblock %}
+{% block breadcrumb %}Gérez vos informations personnelles{% endblock %}
+{% block topbar_actions %}<a href="{% url 'accounts:profil_modifier' %}" class="btn btn-primary">Modifier mes informations</a>{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item--4 card">
+    <div class="detail-header__id" style="margin-bottom:16px;">
+      {% if request.user.avatar %}<img src="{{ request.user.avatar.url }}" class="avatar-img" style="width:52px;height:52px;">{% else %}<span class="detail-header__avatar">{{ request.user.initiales }}</span>{% endif %}
+      <div><strong style="font-size:16px;">{{ request.user.get_full_name|default:request.user.username }}</strong><div class="stat-card__meta">{{ request.user.get_role_display }}</div></div>
+    </div>
+    <div class="info-row"><span>Nom d'utilisateur</span><span>{{ request.user.username }}</span></div>
+    <div class="info-row"><span>Email</span><span>{{ request.user.email|default:"—" }}</span></div>
+    <div class="info-row"><span>Téléphone</span><span>{{ request.user.telephone|default:"—" }}</span></div>
+    <div class="info-row"><span>Membre depuis</span><span>{{ request.user.date_creation|date:"d/m/Y" }}</span></div>
+    <div class="info-row"><span>Dernière connexion</span><span>{{ request.user.last_login|date:"d/m/Y H:i"|default:"—" }}</span></div>
+    <a href="{% url 'accounts:mot_de_passe_modifier' %}" class="btn btn-secondary" style="width:100%;margin-top:16px;">Changer mon mot de passe</a>
+  </div>
+</div>
+{% endblock %}

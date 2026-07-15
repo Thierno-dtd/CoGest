@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titre %}Catégories{% endblock %}
+{% block page_titre %}Catégories{% endblock %}
+{% block breadcrumb %}Catalogue · regroupement des produits{% endblock %}
+{% block topbar_actions %}<a href="{% url 'produits:categorie_creer' %}" class="btn btn-primary">Nouvelle catégorie</a>{% endblock %}
+{% block content %}
+<div class="bento-grid">
+  <div class="bento-item--4 stat-card">
+    <span class="stat-card__label">Catégories actives</span>
+    <div class="stat-card__value">{{ stats.actives }}</div>
+    <div class="stat-card__meta">sur {{ stats.total }} au total</div>
+  </div>
+</div>
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher une catégorie…"
+           hx-get="{% url 'produits:categorie_liste' %}" hx-trigger="keyup changed delay:350ms, search"
+           hx-target="#categorie-table-wrap" hx-push-url="true">
+  </div>
+</div>
+<div id="categorie-table-wrap">{% include "produits/_categorie_table.html" %}</div>
+{% endblock %}

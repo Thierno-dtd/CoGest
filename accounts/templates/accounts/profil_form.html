@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block page_titre %}Modifier mes informations{% endblock %}
+{% block breadcrumb %}<a href="{% url 'accounts:profil' %}">Mon profil</a> · Modification{% endblock %}
+{% block content %}
+<div class="card" style="max-width:600px;">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-grid">
+      <div class="form-field"><label>Prénom</label>{{ form.first_name }}</div>
+      <div class="form-field"><label>Nom</label>{{ form.last_name }}</div>
+      <div class="form-field"><label>Email</label>{{ form.email }}</div>
+      <div class="form-field"><label>Téléphone</label>{{ form.telephone }}</div>
+      <div class="form-field form-field--full"><label>Photo de profil</label>{{ form.avatar }}</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="{% url 'accounts:profil' %}" class="btn btn-ghost">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

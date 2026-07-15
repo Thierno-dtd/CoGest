@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block page_titre %}Changer mon mot de passe{% endblock %}
+{% block breadcrumb %}<a href="{% url 'accounts:profil' %}">Mon profil</a> · Sécurité{% endblock %}
+{% block content %}
+<div class="card" style="max-width:480px;">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-field" style="margin-bottom:14px;"><label>Mot de passe actuel</label>{{ form.old_password }}</div>
+    <div class="form-field" style="margin-bottom:14px;"><label>Nouveau mot de passe</label>{{ form.new_password1 }}</div>
+    <div class="form-field" style="margin-bottom:14px;"><label>Confirmer le nouveau mot de passe</label>{{ form.new_password2 }}</div>
+    {% for field in form %}{% if field.errors %}<p class="error-text">{{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
+    <button type="submit" class="btn btn-primary" style="width:100%;">Mettre à jour le mot de passe</button>
+  </form>
+</div>
+{% endblock %}

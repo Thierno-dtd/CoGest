@@ -2,6 +2,7 @@
 {% load core_extras %}
 {% block page_titre %}{{ achat.numero }}{% endblock %}
 {% block breadcrumb %}<a href="{% url 'achats:achat_liste' %}">Achats</a> · Détail de la commande{% endblock %}
+{% block bouton_retour %}{% url 'achats:achat_liste' as retour_url %}{% include "core/_bouton_retour.html" with fallback_url=retour_url %}{% endblock %}
 {% block topbar_actions %}
 {% if achat.facture %}<a href="{% url 'facturation:facture_detail' achat.facture.pk %}" class="btn btn-secondary">Voir la facture</a>{% endif %}
 {% endblock %}

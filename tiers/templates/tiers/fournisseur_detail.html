@@ -2,6 +2,7 @@
 {% load core_extras %}
 {% block page_titre %}{{ fournisseur.raison_sociale }}{% endblock %}
 {% block breadcrumb %}<a href="{% url 'tiers:fournisseur_liste' %}">Fournisseurs</a> · Fiche fournisseur{% endblock %}
+{% block bouton_retour %}{% url 'tiers:fournisseur_liste' as retour_url %}{% include "core/_bouton_retour.html" with fallback_url=retour_url %}{% endblock %}
 {% block topbar_actions %}<button hx-get="{% url 'tiers:fournisseur_modifier' fournisseur.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier</button>{% endblock %}
 {% block content %}
 <div class="bento-grid">

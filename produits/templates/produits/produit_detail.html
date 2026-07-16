@@ -3,6 +3,7 @@
 {% block titre %}{{ produit.designation }}{% endblock %}
 {% block page_titre %}{{ produit.designation }}{% endblock %}
 {% block breadcrumb %}<a href="{% url 'produits:produit_liste' %}">Produits</a> · Fiche article{% endblock %}
+{% block bouton_retour %}{% url 'produits:produit_liste' as retour_url %}{% include "core/_bouton_retour.html" with fallback_url=retour_url %}{% endblock %}
 {% block topbar_actions %}
 <button hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier</button>
 {% endblock %}

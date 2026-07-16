@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block page_titre %}Nouvel achat{% endblock %}
 {% block breadcrumb %}<a href="{% url 'achats:achat_liste' %}">Achats</a> · Nouvelle commande{% endblock %}
+{% block bouton_retour %}{% url 'achats:achat_liste' as retour_url %}{% include "core/_bouton_retour.html" with fallback_url=retour_url %}{% endblock %}
 {% block content %}
 <form method="post" id="achat-form">
   {% csrf_token %}

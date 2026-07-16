@@ -2,6 +2,7 @@
 {% load core_extras %}
 {% block page_titre %}{{ vente.numero }}{% endblock %}
 {% block breadcrumb %}<a href="{% url 'ventes:vente_liste' %}">Ventes</a> · Détail de la vente{% endblock %}
+{% block bouton_retour %}{% url 'ventes:vente_liste' as retour_url %}{% include "core/_bouton_retour.html" with fallback_url=retour_url %}{% endblock %}
 {% block topbar_actions %}
 {% if vente.facture %}<a href="{% url 'facturation:facture_detail' vente.facture.pk %}" class="btn btn-secondary">Voir la facture</a>{% endif %}
 {% if vente.statut == "VALIDEE" %}

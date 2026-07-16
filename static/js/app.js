@@ -23,6 +23,20 @@ document.body.addEventListener('fournisseurSupprime', fermerModal);
 document.body.addEventListener('categorieSupprime', fermerModal);
 
 // ---------------------------------------------------------
+// Bouton retour (topbar des pages de détail)
+// ---------------------------------------------------------
+function retourPage(fallbackUrl) {
+  const memeOrigine = document.referrer && document.referrer.startsWith(window.location.origin);
+  if (memeOrigine && window.history.length > 1) {
+    window.history.back();
+  } else if (fallbackUrl) {
+    window.location.href = fallbackUrl;
+  } else {
+    window.history.back();
+  }
+}
+
+// ---------------------------------------------------------
 // Gestion dynamique des lignes de formulaire (achats / ventes)
 // ---------------------------------------------------------
 function initFormsetLignes(conteneurId, prefixeVide) {

@@ -122,6 +122,7 @@
       <button class="icon-btn topbar__burger" @click="sidebarOpen = !sidebarOpen" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
+      {% block bouton_retour %}{% endblock %}
       <div class="topbar__title">
         <h1>{% block page_titre %}Tableau de bord{% endblock %}</h1>
         <p class="topbar__breadcrumb">{% block breadcrumb %}Vue d'ensemble de l'activité{% endblock %}</p>

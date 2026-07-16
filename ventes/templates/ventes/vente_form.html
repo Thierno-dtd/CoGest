@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block page_titre %}Nouvelle vente{% endblock %}
 {% block breadcrumb %}<a href="{% url 'ventes:vente_liste' %}">Ventes</a> · Nouvelle transaction{% endblock %}
+{% block bouton_retour %}{% url 'ventes:vente_liste' as retour_url %}{% include "core/_bouton_retour.html" with fallback_url=retour_url %}{% endblock %}
+
 {% block content %}
 <form method="post" id="vente-form">
   {% csrf_token %}

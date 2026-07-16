@@ -2,6 +2,7 @@
 {% load core_extras %}
 {% block page_titre %}{{ client.nom_complet }}{% endblock %}
 {% block breadcrumb %}<a href="{% url 'tiers:client_liste' %}">Clients</a> · Fiche client{% endblock %}
+{% block bouton_retour %}{% url 'tiers:client_liste' as retour_url %}{% include "core/_bouton_retour.html" with fallback_url=retour_url %}{% endblock %}
 {% block topbar_actions %}<button hx-get="{% url 'tiers:client_modifier' client.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier</button>{% endblock %}
 {% block content %}
 <div class="bento-grid">

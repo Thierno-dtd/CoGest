@@ -2,7 +2,7 @@
 {% load core_extras %}
 {% block page_titre %}Clients{% endblock %}
 {% block breadcrumb %}Tiers · portefeuille clients{% endblock %}
-{% block topbar_actions %}<a href="{% url 'tiers:client_creer' %}" class="btn btn-primary">Nouveau client</a>{% endblock %}
+{% block topbar_actions %}<button hx-get="{% url 'tiers:client_creer' %}" hx-target="#modal-root" class="btn btn-primary">Nouveau client</button>{% endblock %}
 {% block content %}
 <div class="bento-grid">
   <div class="bento-item stat-card"><span class="stat-card__label">Clients actifs</span><div class="stat-card__value">{{ stats.actifs }}</div><div class="stat-card__meta">sur {{ stats.total }} enregistré{{ stats.total|pluralize }}</div></div>

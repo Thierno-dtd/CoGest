@@ -2,7 +2,7 @@
 {% load core_extras %}
 {% block page_titre %}{{ client.nom_complet }}{% endblock %}
 {% block breadcrumb %}<a href="{% url 'tiers:client_liste' %}">Clients</a> · Fiche client{% endblock %}
-{% block topbar_actions %}<a href="{% url 'tiers:client_modifier' client.pk %}" class="btn btn-secondary">Modifier</a>{% endblock %}
+{% block topbar_actions %}<button hx-get="{% url 'tiers:client_modifier' client.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier</button>{% endblock %}
 {% block content %}
 <div class="bento-grid">
   <div class="bento-item stat-card"><span class="stat-card__label">Chiffre d'affaires</span><div class="stat-card__value">{{ client.chiffre_affaires|fcfa }}</div><div class="stat-card__meta">ventes validées</div></div>

@@ -10,6 +10,7 @@ from core.decorators import role_requis
 from core.reponses import reponse_suppression
 from .models import Client, Fournisseur
 from .forms import ClientForm, FournisseurForm
+from core.reponses import reponse_suppression
 
 
 @login_required
@@ -50,9 +51,13 @@ def client_creer(request):
         if form.is_valid():
             client = form.save()
             messages.success(request, f"Client « {client.nom_complet} » créé avec succès.")
-            return redirect('tiers:client_detail', pk=client.pk)
+            return reponse_suppression(request, 'tiers:client_detail', pk=client.pk)
+        if request.htmx:
+            return render(request, 'tiers/_client_modal.html', {'form': form, 'titre': 'Nouveau client'})
     else:
         form = ClientForm()
+        if request.htmx:
+            return render(request, 'tiers/_client_modal.html', {'form': form, 'titre': 'Nouveau client'})
     return render(request, 'tiers/client_form.html', {'form': form, 'titre': 'Nouveau client'})
 
 
@@ -64,9 +69,13 @@ def client_modifier(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Client mis à jour avec succès.")
-            return redirect('tiers:client_detail', pk=client.pk)
+            return reponse_suppression(request, 'tiers:client_detail', pk=client.pk)
+        if request.htmx:
+            return render(request, 'tiers/_client_modal.html', {'form': form, 'titre': 'Modifier le client'})
     else:
         form = ClientForm(instance=client)
+        if request.htmx:
+            return render(request, 'tiers/_client_modal.html', {'form': form, 'titre': 'Modifier le client'})
     return render(request, 'tiers/client_form.html', {'form': form, 'titre': 'Modifier le client', 'client': client})
 
 
@@ -117,13 +126,17 @@ def fournisseur_creer(request):
         if form.is_valid():
             fournisseur = form.save()
             messages.success(request, f"Fournisseur « {fournisseur.raison_sociale} » créé avec succès.")
-            return redirect('tiers:fournisseur_detail', pk=fournisseur.pk)
+            return reponse_suppression(request, 'tiers:fournisseur_detail', pk=fournisseur.pk)
+        if request.htmx:
+            return render(request, 'tiers/_fournisseur_modal.html', {'form': form, 'titre': 'Nouveau fournisseur'})
     else:
         form = FournisseurForm()
+        if request.htmx:
+            return render(request, 'tiers/_fournisseur_modal.html', {'form': form, 'titre': 'Nouveau fournisseur'})
     return render(request, 'tiers/fournisseur_form.html', {'form': form, 'titre': 'Nouveau fournisseur'})
 
 
-@login_required
+login_required
 def fournisseur_modifier(request, pk):
     fournisseur = get_object_or_404(Fournisseur, pk=pk)
     if request.method == 'POST':
@@ -131,11 +144,14 @@ def fournisseur_modifier(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Fournisseur mis à jour avec succès.")
-            return redirect('tiers:fournisseur_detail', pk=fournisseur.pk)
+            return reponse_suppression(request, 'tiers:fournisseur_detail', pk=fournisseur.pk)
+        if request.htmx:
+            return render(request, 'tiers/_fournisseur_modal.html', {'form': form, 'titre': 'Modifier le fournisseur'})
     else:
         form = FournisseurForm(instance=fournisseur)
+        if request.htmx:
+            return render(request, 'tiers/_fournisseur_modal.html', {'form': form, 'titre': 'Modifier le fournisseur'})
     return render(request, 'tiers/fournisseur_form.html', {'form': form, 'titre': 'Modifier le fournisseur', 'fournisseur': fournisseur})
-
 
 @login_required
 @role_requis('peut_administrer')

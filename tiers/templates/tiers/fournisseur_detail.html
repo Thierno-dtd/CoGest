@@ -2,7 +2,7 @@
 {% load core_extras %}
 {% block page_titre %}{{ fournisseur.raison_sociale }}{% endblock %}
 {% block breadcrumb %}<a href="{% url 'tiers:fournisseur_liste' %}">Fournisseurs</a> · Fiche fournisseur{% endblock %}
-{% block topbar_actions %}<a href="{% url 'tiers:fournisseur_modifier' fournisseur.pk %}" class="btn btn-secondary">Modifier</a>{% endblock %}
+{% block topbar_actions %}<button hx-get="{% url 'tiers:fournisseur_modifier' fournisseur.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier</button>{% endblock %}
 {% block content %}
 <div class="bento-grid">
   <div class="bento-item stat-card"><span class="stat-card__label">Total achats</span><div class="stat-card__value">{{ fournisseur.montant_total_achats|fcfa }}</div><div class="stat-card__meta">{{ fournisseur.nb_achats }} commande{{ fournisseur.nb_achats|pluralize }}</div></div>

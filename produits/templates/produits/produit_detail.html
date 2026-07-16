@@ -4,7 +4,7 @@
 {% block page_titre %}{{ produit.designation }}{% endblock %}
 {% block breadcrumb %}<a href="{% url 'produits:produit_liste' %}">Produits</a> · Fiche article{% endblock %}
 {% block topbar_actions %}
-<a href="{% url 'produits:produit_modifier' produit.pk %}" class="btn btn-secondary">Modifier</a>
+<button hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier</button>
 {% endblock %}
 {% block content %}
 <div class="bento-grid">
@@ -64,7 +64,7 @@
     {% if produit.image %}<img src="{{ produit.image.url }}" style="width:100%;border-radius:14px;margin-bottom:14px;object-fit:cover;max-height:220px;">{% endif %}
     <h3 class="section-title">Actions</h3>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <a href="{% url 'produits:produit_modifier' produit.pk %}" class="btn btn-secondary">Modifier le produit</a>
+      <button hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier le produit</button>
       <button class="btn btn-danger" hx-get="{% url 'produits:produit_supprimer' produit.pk %}" hx-target="#modal-root">Désactiver le produit</button>
     </div>
   </div>

@@ -10,7 +10,7 @@
         <td>{% if cat.est_active %}<span class="badge badge--vert">Active</span>{% else %}<span class="badge badge--gris">Inactive</span>{% endif %}</td>
         <td>
           <div class="row-actions">
-            <a class="icon-btn" href="{% url 'produits:categorie_modifier' cat.pk %}" title="Modifier"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></a>
+            <button class="icon-btn" title="Modifier" hx-get="{% url 'produits:categorie_modifier' cat.pk %}" hx-target="#modal-root"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
             <button class="icon-btn" title="Désactiver" hx-get="{% url 'produits:categorie_supprimer' cat.pk %}" hx-target="#modal-root"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
         </td>

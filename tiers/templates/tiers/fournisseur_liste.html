@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block page_titre %}Fournisseurs{% endblock %}
 {% block breadcrumb %}Tiers · réseau de fournisseurs{% endblock %}
-{% block topbar_actions %}<a href="{% url 'tiers:fournisseur_creer' %}" class="btn btn-primary">Nouveau fournisseur</a>{% endblock %}
+{% block topbar_actions %}<button hx-get="{% url 'tiers:fournisseur_creer' %}" hx-target="#modal-root" class="btn btn-primary">Nouveau fournisseur</button>{% endblock %}
 {% block content %}
 <div class="bento-grid">
   <div class="bento-item stat-card"><span class="stat-card__label">Fournisseurs actifs</span><div class="stat-card__value">{{ stats.actifs }}</div><div class="stat-card__meta">sur {{ stats.total }} au total</div></div>

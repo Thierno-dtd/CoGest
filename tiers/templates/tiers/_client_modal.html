@@ -1,0 +1,15 @@
+{% extends "core/modal_base.html" %}
+{% block modal_size %}modal-box--lg{% endblock %}
+{% block modal_titre %}{{ titre }}{% endblock %}
+{% block modal_corps %}
+<div class="form-grid" x-data="{ typeClient: '{{ form.type_client.value|default:'PARTICULIER' }}' }">
+  <div class="form-field"><label>Type de client</label>{{ form.type_client }}</div>
+  <div class="form-field"><label>Plafond de crédit (FCFA)</label>{{ form.plafond_credit }}</div>
+  <div class="form-field"><label x-text="typeClient === 'ENTREPRISE' ? 'Raison sociale' : 'Nom'">Nom</label>{{ form.nom }}</div>
+  <div class="form-field" x-show="typeClient !== 'ENTREPRISE'"><label>Prénom</label>{{ form.prenom }}</div>
+  <div class="form-field"><label>Téléphone</label>{{ form.telephone }}</div>
+  <div class="form-field"><label>Email</label>{{ form.email }}</div>
+  <div class="form-field form-field--full"><label>Adresse</label>{{ form.adresse }}</div>
+  <div class="form-field form-field--full switch-row">{{ form.est_actif }}<label>Client actif</label></div>
+</div>
+{% endblock %}

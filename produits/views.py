@@ -75,9 +75,13 @@ def produit_creer(request):
         if form.is_valid():
             produit = form.save()
             messages.success(request, f"Le produit « {produit.designation} » a été créé avec succès.")
-            return redirect('produits:produit_detail', pk=produit.pk)
+            return reponse_suppression(request, 'produits:produit_detail', pk=produit.pk)
+        if request.htmx:
+            return render(request, 'produits/_produit_modal.html', {'form': form, 'titre': 'Nouveau produit'})
     else:
         form = ProduitForm()
+        if request.htmx:
+            return render(request, 'produits/_produit_modal.html', {'form': form, 'titre': 'Nouveau produit'})
     return render(request, 'produits/produit_form.html', {'form': form, 'titre': 'Nouveau produit'})
 
 
@@ -89,9 +93,13 @@ def produit_modifier(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Produit mis à jour avec succès.")
-            return redirect('produits:produit_detail', pk=produit.pk)
+            return reponse_suppression(request, 'produits:produit_detail', pk=produit.pk)
+        if request.htmx:
+            return render(request, 'produits/_produit_modal.html', {'form': form, 'titre': 'Modifier le produit'})
     else:
         form = ProduitForm(instance=produit)
+        if request.htmx:
+            return render(request, 'produits/_produit_modal.html', {'form': form, 'titre': 'Modifier le produit'})
     return render(request, 'produits/produit_form.html', {'form': form, 'titre': 'Modifier le produit', 'produit': produit})
 
 
@@ -131,9 +139,13 @@ def categorie_creer(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Catégorie créée avec succès.")
-            return redirect('produits:categorie_liste')
+            return reponse_suppression(request, 'produits:categorie_liste')
+        if request.htmx:
+            return render(request, 'produits/_categorie_modal.html', {'form': form, 'titre': 'Nouvelle catégorie'})
     else:
         form = CategorieForm()
+        if request.htmx:
+            return render(request, 'produits/_categorie_modal.html', {'form': form, 'titre': 'Nouvelle catégorie'})
     return render(request, 'produits/categorie_form.html', {'form': form, 'titre': 'Nouvelle catégorie'})
 
 
@@ -145,9 +157,13 @@ def categorie_modifier(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Catégorie mise à jour.")
-            return redirect('produits:categorie_liste')
+            return reponse_suppression(request, 'produits:categorie_liste')
+        if request.htmx:
+            return render(request, 'produits/_categorie_modal.html', {'form': form, 'titre': 'Modifier la catégorie'})
     else:
         form = CategorieForm(instance=categorie)
+        if request.htmx:
+            return render(request, 'produits/_categorie_modal.html', {'form': form, 'titre': 'Modifier la catégorie'})
     return render(request, 'produits/categorie_form.html', {'form': form, 'titre': 'Modifier la catégorie'})
 
 

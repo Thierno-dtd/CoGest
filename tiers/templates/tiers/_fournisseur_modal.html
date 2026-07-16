@@ -1,0 +1,14 @@
+{% extends "core/modal_base.html" %}
+{% block modal_size %}modal-box--lg{% endblock %}
+{% block modal_titre %}{{ titre }}{% endblock %}
+{% block modal_corps %}
+<div class="form-grid">
+  <div class="form-field form-field--full"><label>Raison sociale</label>{{ form.raison_sociale }}</div>
+  <div class="form-field"><label>Contact principal</label>{{ form.contact_principal }}</div>
+  <div class="form-field"><label>Délai livraison moyen (jours)</label>{{ form.delai_livraison_moyen_jours }}</div>
+  <div class="form-field"><label>Téléphone</label>{{ form.telephone }}</div>
+  <div class="form-field"><label>Email</label>{{ form.email }}</div>
+  <div class="form-field form-field--full"><label>Adresse</label>{{ form.adresse }}</div>
+  <div class="form-field form-field--full switch-row">{{ form.est_actif }}<label>Fournisseur actif</label></div>
+</div>
+{% endblock %}

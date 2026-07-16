@@ -1,0 +1,20 @@
+{% extends "core/modal_base.html" %}
+{% block modal_size %}modal-box--lg{% endblock %}
+{% block modal_titre %}{{ titre }}{% endblock %}
+{% block modal_enctype %}enctype="multipart/form-data"{% endblock %}
+{% block modal_corps %}
+<div class="form-grid">
+  <div class="form-field"><label>Référence</label>{{ form.reference }}{% if form.reference.errors %}<span class="error-text">{{ form.reference.errors|join:", " }}</span>{% endif %}</div>
+  <div class="form-field"><label>Désignation</label>{{ form.designation }}</div>
+  <div class="form-field"><label>Catégorie</label>{{ form.categorie }}</div>
+  <div class="form-field"><label>Unité de mesure</label>{{ form.unite_mesure }}</div>
+  <div class="form-field"><label>Prix d'achat (FCFA)</label>{{ form.prix_achat }}</div>
+  <div class="form-field"><label>Prix de vente (FCFA)</label>{{ form.prix_vente }}</div>
+  <div class="form-field"><label>Quantité en stock</label>{{ form.quantite_stock }}{% if form.quantite_stock.help_text %}<span class="help-text">{{ form.quantite_stock.help_text }}</span>{% endif %}</div>
+  <div class="form-field"><label>Seuil d'alerte</label>{{ form.seuil_alerte }}</div>
+  <div class="form-field"><label>Taux de TVA (ex : 0.18)</label>{{ form.taux_tva }}</div>
+  <div class="form-field"><label>Code-barres (optionnel)</label>{{ form.code_barre }}</div>
+  <div class="form-field form-field--full"><label>Image</label>{{ form.image }}</div>
+  <div class="form-field form-field--full switch-row">{{ form.est_actif }}<label>Produit actif</label></div>
+</div>
+{% endblock %}

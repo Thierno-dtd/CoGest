@@ -1,0 +1,14 @@
+<div class="modal-overlay">
+  <div class="modal-box glass-panel {% block modal_size %}{% endblock %}">
+    <h3>{% block modal_titre %}{% endblock %}</h3>
+    {% block modal_intro %}{% endblock %}
+    <form hx-post="{{ request.path }}" hx-target="#modal-root" hx-swap="innerHTML" method="post" {% block modal_enctype %}{% endblock %}>
+      {% csrf_token %}
+      {% block modal_corps %}{% endblock %}
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="fermerModal()">Annuler</button>
+        <button type="submit" class="btn btn-primary">{% block modal_bouton %}Enregistrer{% endblock %}</button>
+      </div>
+    </form>
+  </div>
+</div>

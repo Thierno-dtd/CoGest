@@ -22,9 +22,9 @@
         </td>
         <td>
           <div class="row-actions">
-            <a class="icon-btn" href="{% url 'produits:produit_modifier' produit.pk %}" title="Modifier">
+            <button class="icon-btn" hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" title="Modifier">
               <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </a>
+            </button>
             <button class="icon-btn" title="Supprimer" hx-get="{% url 'produits:produit_supprimer' produit.pk %}" hx-target="#modal-root">
               <svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>

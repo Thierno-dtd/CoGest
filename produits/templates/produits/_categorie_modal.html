@@ -1,0 +1,9 @@
+{% extends "core/modal_base.html" %}
+{% block modal_titre %}{{ titre }}{% endblock %}
+{% block modal_corps %}
+<div class="form-grid">
+  <div class="form-field form-field--full"><label>Libellé</label>{{ form.libelle }}{% if form.libelle.errors %}<span class="error-text">{{ form.libelle.errors|join:", " }}</span>{% endif %}</div>
+  <div class="form-field form-field--full"><label>Description</label>{{ form.description }}</div>
+  <div class="form-field form-field--full switch-row">{{ form.est_active }}<label>Catégorie active</label></div>
+</div>
+{% endblock %}

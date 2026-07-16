@@ -1,6 +1,23 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr" x-data="{ sidebarOpen: false }" :class="{ 'sidebar-open': sidebarOpen }">
+<html lang="fr"
+      x-data="{
+        sidebarOpen: false,
+        sidebarMode: localStorage.getItem('sidebarMode') || 'fixe',
+        sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+        sidebarHover: false,
+        get railCollapsed() { return this.sidebarMode === 'dynamique' || this.sidebarCollapsed },
+        get visuallyExpanded() { return this.sidebarMode === 'fixe' ? !this.sidebarCollapsed : this.sidebarHover },
+        get isFloating() { return this.railCollapsed && this.visuallyExpanded },
+        toggleMode() {
+          this.sidebarMode = this.sidebarMode === 'fixe' ? 'dynamique' : 'fixe';
+          localStorage.setItem('sidebarMode', this.sidebarMode);
+        },
+        toggleCollapsed() {
+          this.sidebarCollapsed = !this.sidebarCollapsed;
+          localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
+        }
+      }">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,66 +32,88 @@
 </head>
 <body>
 <div class="app-shell">
-  <aside class="sidebar" :class="{ 'sidebar--open': sidebarOpen }">
-    <div class="sidebar__brand">
-      <span class="sidebar__mark">GC</span>
-      <div class="sidebar__brand-text">
-        <strong>Gestion</strong>
-        <span>Commerciale</span>
+
+  <div class="sidebar-rail" :class="{ 'sidebar-rail--collapsed': railCollapsed }">
+    <aside class="sidebar"
+           :class="{ 'sidebar--open': sidebarOpen, 'sidebar--floating': isFloating, 'sidebar--icons-only': railCollapsed && !isFloating }"
+           @mouseenter="sidebarMode === 'dynamique' && (sidebarHover = true)"
+           @mouseleave="sidebarHover = false">
+
+      <div class="sidebar__brand">
+        <span class="sidebar__mark">GC</span>
+        <div class="sidebar__brand-text sidebar-label">
+          <strong>Gestion</strong>
+          <span>Commerciale</span>
+        </div>
+        <button class="sidebar__pin no-print sidebar-label" x-show="sidebarMode === 'fixe'" x-cloak
+                @click="toggleCollapsed()" title="Réduire / agrandir le menu">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 6 15 12 9 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180 12 12)"/></svg>
+        </button>
       </div>
-    </div>
 
-    <nav class="sidebar__nav">
-      <p class="sidebar__section">Pilotage</p>
-      <a href="{% url 'dashboard:accueil' %}" class="nav-link {% if request.resolver_match.url_name == 'accueil' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6V11h-6v9Zm0-16v5h6V4h-6Z" fill="currentColor"/></svg>
-        Tableau de bord
-      </a>
+      <button class="sidebar__pin-collapsed no-print" x-show="sidebarMode === 'fixe' && railCollapsed" x-cloak
+              @click="toggleCollapsed()" title="Agrandir le menu">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 6 15 12 9 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
 
-      <p class="sidebar__section">Catalogue</p>
-      <a href="{% url 'produits:produit_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'produits' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 8l9 5 9-5M12 13v8" stroke="currentColor" stroke-width="1.6"/></svg>
-        Produits
-      </a>
-      <a href="{% url 'produits:categorie_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'categorie_liste' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Catégories
-      </a>
-      <a href="{% url 'stock:mouvement_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'stock' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Mouvements de stock
-      </a>
+      <nav class="sidebar__nav">
+        <p class="sidebar__section sidebar-label">Pilotage</p>
+        <a href="{% url 'dashboard:accueil' %}" class="nav-link {% if request.resolver_match.url_name == 'accueil' %}nav-link--active{% endif %}" title="Tableau de bord">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6V11h-6v9Zm0-16v5h6V4h-6Z" fill="currentColor"/></svg>
+          <span class="sidebar-label">Tableau de bord</span>
+        </a>
 
-      <p class="sidebar__section">Tiers</p>
-      <a href="{% url 'tiers:client_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'client_liste' or request.resolver_match.url_name == 'client_detail' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c0-3.5 3.2-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Clients
-      </a>
-      <a href="{% url 'tiers:fournisseur_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'fournisseur_liste' or request.resolver_match.url_name == 'fournisseur_detail' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 21V9l9-5 9 5v12" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 21v-6h6v6" stroke="currentColor" stroke-width="1.6"/></svg>
-        Fournisseurs
-      </a>
+        <p class="sidebar__section sidebar-label">Catalogue</p>
+        <a href="{% url 'produits:produit_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'produits' %}nav-link--active{% endif %}" title="Produits">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 8l9 5 9-5M12 13v8" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span class="sidebar-label">Produits</span>
+        </a>
+        <a href="{% url 'produits:categorie_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'categorie_liste' %}nav-link--active{% endif %}" title="Catégories">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span class="sidebar-label">Catégories</span>
+        </a>
+        <a href="{% url 'stock:mouvement_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'stock' %}nav-link--active{% endif %}" title="Mouvements de stock">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span class="sidebar-label">Mouvements de stock</span>
+        </a>
 
-      <p class="sidebar__section">Flux commerciaux</p>
-      <a href="{% url 'achats:achat_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'achats' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 4h2l2 12h11l2-8H7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.4" fill="currentColor"/><circle cx="17" cy="20" r="1.4" fill="currentColor"/></svg>
-        Achats
-      </a>
-      <a href="{% url 'ventes:vente_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'ventes' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.6 12.6a2 2 0 0 0 2 1.6h7a2 2 0 0 0 2-1.6L21 8H6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        Ventes
-      </a>
-      <a href="{% url 'facturation:facture_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'facturation' %}nav-link--active{% endif %}">
-        <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M7 3h8l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 11h6M10 15h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Factures &amp; règlements
-      </a>
-    </nav>
+        <p class="sidebar__section sidebar-label">Tiers</p>
+        <a href="{% url 'tiers:client_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'client_liste' or request.resolver_match.url_name == 'client_detail' %}nav-link--active{% endif %}" title="Clients">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c0-3.5 3.2-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span class="sidebar-label">Clients</span>
+        </a>
+        <a href="{% url 'tiers:fournisseur_liste' %}" class="nav-link {% if request.resolver_match.url_name == 'fournisseur_liste' or request.resolver_match.url_name == 'fournisseur_detail' %}nav-link--active{% endif %}" title="Fournisseurs">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 21V9l9-5 9 5v12" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 21v-6h6v6" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span class="sidebar-label">Fournisseurs</span>
+        </a>
 
-    <div class="sidebar__footer">
-      <p>Connecté en tant que</p>
-      <strong>{{ request.user.get_role_display }}</strong>
-    </div>
-  </aside>
+        <p class="sidebar__section sidebar-label">Flux commerciaux</p>
+        <a href="{% url 'achats:achat_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'achats' %}nav-link--active{% endif %}" title="Achats">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 4h2l2 12h11l2-8H7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.4" fill="currentColor"/><circle cx="17" cy="20" r="1.4" fill="currentColor"/></svg>
+          <span class="sidebar-label">Achats</span>
+        </a>
+        <a href="{% url 'ventes:vente_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'ventes' %}nav-link--active{% endif %}" title="Ventes">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.6 12.6a2 2 0 0 0 2 1.6h7a2 2 0 0 0 2-1.6L21 8H6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          <span class="sidebar-label">Ventes</span>
+        </a>
+        <a href="{% url 'facturation:facture_liste' %}" class="nav-link {% if request.resolver_match.app_name == 'facturation' %}nav-link--active{% endif %}" title="Factures & règlements">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M7 3h8l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 11h6M10 15h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span class="sidebar-label">Factures &amp; règlements</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__footer">
+        <div class="sidebar__mode-toggle sidebar-label">
+          <span>Réduction au survol</span>
+          <button type="button" class="toggle-switch" :class="{ 'toggle-switch--on': sidebarMode === 'dynamique' }" @click="toggleMode()" role="switch" :aria-checked="sidebarMode === 'dynamique'">
+            <span class="toggle-switch__dot"></span>
+          </button>
+        </div>
+        <p class="sidebar-label">Connecté en tant que</p>
+        <strong class="sidebar-label">{{ request.user.get_role_display }}</strong>
+      </div>
+    </aside>
+  </div>
 
   <div class="sidebar-backdrop" @click="sidebarOpen = false" :class="{ 'is-visible': sidebarOpen }"></div>
 

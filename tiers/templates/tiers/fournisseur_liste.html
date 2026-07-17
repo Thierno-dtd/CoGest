@@ -13,6 +13,7 @@
     <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un fournisseur…"
            hx-get="{% url 'tiers:fournisseur_liste' %}" hx-trigger="keyup changed delay:350ms, search" hx-target="#fournisseur-table-wrap" hx-push-url="true">
   </div>
+  {% include "core/_vue_toggle.html" %}
 </div>
 <div id="fournisseur-table-wrap">{% include "tiers/_fournisseur_table.html" %}</div>
 {% endblock %}

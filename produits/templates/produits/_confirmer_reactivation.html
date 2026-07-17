@@ -1,0 +1,13 @@
+<div class="modal-overlay">
+  <div class="modal-box glass-panel">
+    <h3>Réactiver « {{ objet }} » ?</h3>
+    <p>Le produit redeviendra visible dans les listes actives et pourra de nouveau être utilisé dans les achats et les ventes.</p>
+    <form hx-post="{{ request.path }}" hx-target="#modal-root" method="post">
+      {% csrf_token %}
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="fermerModal()">Annuler</button>
+        <button type="submit" class="btn btn-primary">Réactiver</button>
+      </div>
+    </form>
+  </div>
+</div>

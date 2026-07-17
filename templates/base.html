@@ -56,7 +56,7 @@
         <svg viewBox="0 0 24 24" fill="none"><path d="M9 6 15 12 9 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
 
-      <nav class="sidebar__nav">
+      <nav class="sidebar__nav" >
         <p class="sidebar__section sidebar-label">Pilotage</p>
         <a href="{% url 'dashboard:accueil' %}" class="nav-link {% if request.resolver_match.url_name == 'accueil' %}nav-link--active{% endif %}" title="Tableau de bord">
           <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6V11h-6v9Zm0-16v5h6V4h-6Z" fill="currentColor"/></svg>
@@ -109,8 +109,7 @@
             <span class="toggle-switch__dot"></span>
           </button>
         </div>
-        <p class="sidebar-label">Connecté en tant que</p>
-        <strong class="sidebar-label">{{ request.user.get_role_display }}</strong>
+        
       </div>
     </aside>
   </div>
@@ -145,7 +144,7 @@
             <a href="{% url 'accounts:profil' %}">Mon profil</a>
             <a href="{% url 'accounts:profil_modifier' %}">Modifier mes informations</a>
             <a href="{% url 'accounts:mot_de_passe_modifier' %}">Changer mon mot de passe</a>
-            {% if request.user.is_superuser %}<a href="/admin/">Administration Django</a>{% endif %}
+            <!-- {% if request.user.is_superuser %}<a href="/admin/">Administration Django</a>{% endif %} -->
             <form method="post" action="{% url 'accounts:deconnexion' %}">
               {% csrf_token %}
               <button type="submit" class="user-menu__logout">Se déconnecter</button>
@@ -173,6 +172,7 @@
 
 <div id="modal-root"></div>
 <script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'js/charts.js' %}"></script>
 {% block extra_scripts %}{% endblock %}
 </body>
 </html>

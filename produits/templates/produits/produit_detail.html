@@ -5,7 +5,11 @@
 {% block breadcrumb %}<a href="{% url 'produits:produit_liste' %}">Produits</a> · Fiche article{% endblock %}
 {% block bouton_retour %}{% url 'produits:produit_liste' as retour_url %}{% include "core/_bouton_retour.html" with fallback_url=retour_url %}{% endblock %}
 {% block topbar_actions %}
+{% if produit.est_actif %}
 <button hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier</button>
+{% else %}
+<button hx-get="{% url 'produits:produit_reactiver' produit.pk %}" hx-target="#modal-root" class="btn btn-secondary">Réactiver</button>
+{% endif %}
 {% endblock %}
 {% block content %}
 <div class="bento-grid">
@@ -65,8 +69,13 @@
     {% if produit.image %}<img src="{{ produit.image.url }}" style="width:100%;border-radius:14px;margin-bottom:14px;object-fit:cover;max-height:220px;">{% endif %}
     <h3 class="section-title">Actions</h3>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier le produit</button>
-      <button class="btn btn-danger" hx-get="{% url 'produits:produit_supprimer' produit.pk %}" hx-target="#modal-root">Désactiver le produit</button>
+      {% if produit.est_actif %}
+  <button hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" class="btn btn-secondary">Modifier le produit</button>
+  <button class="btn btn-danger" hx-get="{% url 'produits:produit_supprimer' produit.pk %}" hx-target="#modal-root">Désactiver le produit</button>
+  {% else %}
+  <button class="btn btn-primary" hx-get="{% url 'produits:produit_reactiver' produit.pk %}" hx-target="#modal-root">Réactiver le produit</button>
+  {% endif %}
+</div>
     </div>
   </div>
 </div>

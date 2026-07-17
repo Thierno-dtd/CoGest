@@ -14,7 +14,70 @@
   <div class="form-field"><label>Seuil d'alerte</label>{{ form.seuil_alerte }}</div>
   <div class="form-field"><label>Taux de TVA (ex : 0.18)</label>{{ form.taux_tva }}</div>
   <div class="form-field"><label>Code-barres (optionnel)</label>{{ form.code_barre }}</div>
-  <div class="form-field form-field--full"><label>Image</label>{{ form.image }}</div>
+
+  <div class="form-field form-field--full">
+    <label>Image</label>
+    <div class="filepicker" x-data="{
+      preview: '{% if form.instance.image %}{{ form.instance.image.url|escapejs }}{% endif %}',
+      nom: '{% if form.instance.image %}{{ form.instance.image.name|escapejs }}{% endif %}'.split('/').pop(),
+      taille: {% if form.instance.image %}{{ form.instance.image.size }}{% else %}0{% endif %},
+      zoneInput() { return this.$refs.zone.querySelector('input[type=file]'); },
+      zoneClear() { return this.$refs.zone.querySelector('input[type=checkbox]'); },
+      choisir(e) {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        this.preview = URL.createObjectURL(f);
+        this.nom = f.name;
+        this.taille = f.size;
+        const clear = this.zoneClear();
+        if (clear) clear.checked = false;
+      },
+      retirer() {
+        this.zoneInput().value = '';
+        const clear = this.zoneClear();
+        if (clear) clear.checked = true;
+        this.preview = ''; this.nom = ''; this.taille = 0;
+      },
+      tailleFormatee() { return this.taille ? (this.taille / 1024).toFixed(0) + ' Ko' : ''; }
+    }" @change="choisir($event)">
+      <div x-ref="zone" class="hidden-input">{{ form.image }}</div>
+
+      <template x-if="!preview">
+        <button type="button" class="filepicker-empty" @click="zoneInput().click()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="filepicker-empty__title">Cliquez pour choisir une image</span>
+          <span class="filepicker-empty__hint">PNG ou JPG</span>
+        </button>
+      </template>
+
+      <template x-if="preview">
+        <div>
+          <div class="filepicker-filled__frame">
+            <img :src="preview" alt="Aperçu de l'image">
+          </div>
+          <div class="filepicker-filled__bar">
+            <div class="filepicker-filled__info">
+              <div class="filepicker-filled__badge">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" stroke="currentColor" stroke-width="1.6"/><path d="M3 8l9 5 9-5" stroke="currentColor" stroke-width="1.6"/></svg>
+              </div>
+              <div>
+                <p class="filepicker-filled__name" x-text="nom"></p>
+                <p class="filepicker-filled__size" x-text="tailleFormatee()"></p>
+              </div>
+            </div>
+            <div class="filepicker-filled__actions">
+              <button type="button" class="btn-ghost-sm" @click="zoneInput().click()">Changer</button>
+              <button type="button" class="icon-btn" @click="retirer()" aria-label="Retirer l'image">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+    {% if form.image.errors %}<span class="error-text">{{ form.image.errors|join:", " }}</span>{% endif %}
+  </div>
+
   <div class="form-field form-field--full switch-row">{{ form.est_actif }}<label>Produit actif</label></div>
 </div>
 {% endblock %}

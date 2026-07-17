@@ -1,4 +1,17 @@
 // ---------------------------------------------------------
+// Préférence d'affichage grille / tableau (mémorisée, partagée sur toutes les pages)
+// ---------------------------------------------------------
+document.addEventListener('alpine:init', () => {
+  Alpine.store('vue', {
+    mode: localStorage.getItem('vueAffichage') || 'grid',
+    set(mode) {
+      this.mode = mode;
+      localStorage.setItem('vueAffichage', mode);
+    }
+  });
+});
+
+// ---------------------------------------------------------
 // Gestion des modales (chargées dynamiquement via HTMX dans #modal-root)
 // ---------------------------------------------------------
 function fermerModal() {
@@ -26,6 +39,9 @@ document.body.addEventListener('categorieSupprime', fermerModal);
 // Bouton retour (topbar des pages de détail)
 // ---------------------------------------------------------
 function retourPage(fallbackUrl) {
+  // Si on arrive depuis une autre page du site (navigation interne), on utilise l'historique
+  // du navigateur pour revenir exactement là où l'utilisateur était (avec ses filtres/recherche).
+  // Sinon (lien direct, nouvel onglet...), on retombe sur l'URL de secours fournie par la page.
   const memeOrigine = document.referrer && document.referrer.startsWith(window.location.origin);
   if (memeOrigine && window.history.length > 1) {
     window.history.back();

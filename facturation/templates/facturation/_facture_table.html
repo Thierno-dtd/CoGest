@@ -1,29 +1,199 @@
 {% load core_extras %}
-<div class="table-wrap">
-  <table class="data-table">
-    <thead><tr><th>N° facture</th><th>Type</th><th>Tiers</th><th>Échéance</th><th>Montant TTC</th><th>Solde</th><th>Statut</th><th></th></tr></thead>
-    <tbody>
-      {% for f in page_obj %}
-      <tr>
-        <td class="cell-primary"><a href="{% url 'facturation:facture_detail' f.pk %}">{{ f.numero }}</a></td>
-        <td>{% if f.type_facture == "VENTE" %}<span class="badge badge--bleu">Vente</span>{% else %}<span class="badge badge--cuivre">Achat</span>{% endif %}</td>
-        <td>{{ f.tiers }}</td>
-        <td class="cell-muted">{{ f.date_echeance|date:"d/m/Y" }}</td>
-        <td>{{ f.montant_ttc|fcfa }}</td>
-        <td>{{ f.solde_restant|fcfa }}</td>
-        <td>
-          {% if f.est_soldee %}<span class="badge badge--vert">Soldée</span>
-          {% elif f.est_en_retard %}<span class="badge badge--rouge">En retard</span>
-          {% else %}<span class="badge badge--cuivre">En cours</span>{% endif %}
-        </td>
-        <td>
-          <div class="row-actions">
-            <a class="icon-btn" href="{% url 'facturation:facture_pdf' f.pk %}" target="_blank" title="Export PDF"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3h8l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 11h6M10 15h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
-          </div>
-        </td>
-      </tr>
-      {% empty %}<tr><td colspan="8"><div class="empty-state"><p>Aucune facture pour l'instant.</p></div></td></tr>{% endfor %}
-    </tbody>
-  </table>
+
+<div x-data>
+  <!-- =========================
+       MODE GRID
+  ========================== -->
+
+  <div class="doc-grid" x-show="$store.vue.mode === 'grid'" x-cloak>
+    {% for f in page_obj %}
+
+    <div class="doc-card">
+      <div class="doc-card__actions">
+        <a
+          class="icon-btn"
+          href="{% url 'facturation:facture_pdf' f.pk %}"
+          target="_blank"
+          title="Export PDF"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M7 3h8l4 4v14H7V3Z"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M10 11h6M10 15h6"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+          </svg>
+        </a>
+      </div>
+
+      <div class="doc-card__head">
+        <div>
+          <a
+            class="doc-card__number"
+            href="{% url 'facturation:facture_detail' f.pk %}"
+          >
+            {{ f.numero }}
+          </a>
+          <div class="doc-card__tiers">{{ f.tiers }}</div>
+        </div>
+      </div>
+
+      <div class="doc-card__rows">
+        <div class="doc-card__row">
+          <span>Type</span>
+          <span>
+            {% if f.type_facture == "VENTE" %}
+            <span class="badge badge--bleu">Vente</span>
+            {% else %}
+            <span class="badge badge--cuivre">Achat</span>
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="doc-card__row">
+          <span>Échéance</span>
+          <span>{{ f.date_echeance|date:"d/m/Y" }}</span>
+        </div>
+
+        <div class="doc-card__row">
+          <span>Statut</span>
+          <span>
+            {% if f.est_soldee %}
+            <span class="badge badge--vert">Soldée</span>
+            {% elif f.est_en_retard %}
+            <span class="badge badge--rouge">En retard</span>
+            {% else %}
+            <span class="badge badge--cuivre">En cours</span>
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="doc-card__footer">
+        <div>
+          <span class="entity-card__meta">Montant TTC</span><br />
+          <strong>{{ f.montant_ttc|fcfa }}</strong>
+        </div>
+
+        <div style="text-align: right">
+          <span class="entity-card__meta">Solde</span><br />
+          <strong>{{ f.solde_restant|fcfa }}</strong>
+        </div>
+      </div>
+    </div>
+
+    {% empty %}
+
+    <div class="empty-state" style="grid-column: 1/-1">
+      <p><strong>Aucune facture pour l'instant.</strong></p>
+    </div>
+
+    {% endfor %}
+  </div>
+
+  <!-- =========================
+       MODE TABLE
+  ========================== -->
+
+  <div class="table-wrap" x-show="$store.vue.mode === 'table'" x-cloak>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>N° facture</th>
+          <th>Type</th>
+          <th>Tiers</th>
+          <th>Échéance</th>
+          <th>Montant TTC</th>
+          <th>Solde</th>
+          <th>Statut</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for f in page_obj %}
+
+        <tr>
+          <td class="cell-primary">
+            <a href="{% url 'facturation:facture_detail' f.pk %}">
+              {{ f.numero }}
+            </a>
+          </td>
+
+          <td>
+            {% if f.type_facture == "VENTE" %}
+            <span class="badge badge--bleu">Vente</span>
+            {% else %}
+            <span class="badge badge--cuivre">Achat</span>
+            {% endif %}
+          </td>
+
+          <td>{{ f.tiers }}</td>
+
+          <td class="cell-muted">{{ f.date_echeance|date:"d/m/Y" }}</td>
+
+          <td>{{ f.montant_ttc|fcfa }}</td>
+
+          <td>{{ f.solde_restant|fcfa }}</td>
+
+          <td>
+            {% if f.est_soldee %}
+            <span class="badge badge--vert">Soldée</span>
+            {% elif f.est_en_retard %}
+            <span class="badge badge--rouge">En retard</span>
+            {% else %}
+            <span class="badge badge--cuivre">En cours</span>
+            {% endif %}
+          </td>
+
+          <td>
+            <div class="row-actions">
+              <a
+                class="icon-btn"
+                href="{% url 'facturation:facture_pdf' f.pk %}"
+                target="_blank"
+                title="Export PDF"
+              >
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M7 3h8l4 4v14H7V3Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M10 11h6M10 15h6"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </a>
+            </div>
+          </td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+          <td colspan="8">
+            <div class="empty-state">
+              <p><strong>Aucune facture pour l'instant.</strong></p>
+            </div>
+          </td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
   {% include "core/pagination.html" with hx_target="#facture-table-wrap" %}
 </div>

@@ -23,6 +23,7 @@
       <option value="ENTREPRISE" {% if type_client == "ENTREPRISE" %}selected{% endif %}>Entreprise</option>
     </select>
   </div>
+  {% include "core/_vue_toggle.html" %}
 </div>
 <div id="client-table-wrap">{% include "tiers/_client_table.html" %}</div>
 {% endblock %}

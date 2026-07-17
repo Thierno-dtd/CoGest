@@ -1,27 +1,176 @@
 {% load core_extras %}
-<div class="table-wrap">
-  <table class="data-table">
-    <thead><tr><th>N° vente</th><th>Client</th><th>Date</th><th>Statut</th><th>Montant TTC</th><th></th></tr></thead>
-    <tbody>
-      {% for v in page_obj %}
-      <tr>
-        <td class="cell-primary"><a href="{% url 'ventes:vente_detail' v.pk %}">{{ v.numero }}</a></td>
-        <td>{{ v.client.nom_complet }}</td>
-        <td class="cell-muted">{{ v.date_vente|date:"d/m/Y" }}</td>
-        <td>
-          {% if v.statut == "VALIDEE" %}<span class="badge badge--vert">Validée</span>
-          {% elif v.statut == "ANNULEE" %}<span class="badge badge--rouge">Annulée</span>
-          {% else %}<span class="badge badge--bleu">En cours</span>{% endif %}
-        </td>
-        <td>{{ v.total_ttc_cache|fcfa }}</td>
-        <td>
-          <div class="row-actions">
-            <a class="icon-btn" href="{% url 'ventes:vente_detail' v.pk %}" title="Voir le détail"><svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/></svg></a>
-          </div>
-        </td>
-      </tr>
-      {% empty %}<tr><td colspan="6"><div class="empty-state"><p>Aucune vente enregistrée pour l'instant.</p></div></td></tr>{% endfor %}
-    </tbody>
-  </table>
+
+<div x-data>
+  <!-- =========================
+       MODE GRID
+  ========================== -->
+  <div class="doc-grid" x-show="$store.vue.mode === 'grid'" x-cloak>
+    {% for v in page_obj %}
+    <div class="doc-card">
+      <div class="doc-card__actions">
+        <a
+          class="icon-btn"
+          href="{% url 'ventes:vente_detail' v.pk %}"
+          title="Voir le détail"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="2.6"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+          </svg>
+        </a>
+      </div>
+
+      <div class="doc-card__head">
+        <div>
+          <a
+            class="doc-card__number"
+            href="{% url 'ventes:vente_detail' v.pk %}"
+          >
+            {{ v.numero }}
+          </a>
+
+          <div class="doc-card__tiers">{{ v.client.nom_complet }}</div>
+        </div>
+      </div>
+
+      <div class="doc-card__rows">
+        <div class="doc-card__row">
+          <span>Date</span>
+          <span>{{ v.date_vente|date:"d/m/Y" }}</span>
+        </div>
+
+        <div class="doc-card__row">
+          <span>Statut</span>
+
+          <span>
+            {% if v.statut == "VALIDEE" %}
+            <span class="badge badge--vert">Validée</span>
+
+            {% elif v.statut == "ANNULEE" %}
+            <span class="badge badge--rouge">Annulée</span>
+
+            {% else %}
+            <span class="badge badge--bleu">En cours</span>
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="doc-card__footer">
+        <span class="entity-card__meta"> Montant TTC </span>
+
+        <span class="doc-card__amount"> {{ v.total_ttc_cache|fcfa }} </span>
+      </div>
+    </div>
+
+    {% empty %}
+
+    <div class="empty-state" style="grid-column: 1/-1">
+      <p>
+        <strong>Aucune vente enregistrée pour l'instant.</strong>
+      </p>
+    </div>
+
+    {% endfor %}
+  </div>
+
+  <!-- =========================
+       MODE TABLE
+  ========================== -->
+
+  <div class="table-wrap" x-show="$store.vue.mode === 'table'" x-cloak>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>N° vente</th>
+          <th>Client</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Montant TTC</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for v in page_obj %}
+
+        <tr>
+          <td class="cell-primary">
+            <a href="{% url 'ventes:vente_detail' v.pk %}"> {{ v.numero }} </a>
+          </td>
+
+          <td>{{ v.client.nom_complet }}</td>
+
+          <td class="cell-muted">{{ v.date_vente|date:"d/m/Y" }}</td>
+
+          <td>
+            {% if v.statut == "VALIDEE" %}
+            <span class="badge badge--vert"> Validée </span>
+
+            {% elif v.statut == "ANNULEE" %}
+            <span class="badge badge--rouge"> Annulée </span>
+
+            {% else %}
+            <span class="badge badge--bleu"> En cours </span>
+
+            {% endif %}
+          </td>
+
+          <td>{{ v.total_ttc_cache|fcfa }}</td>
+
+          <td>
+            <div class="row-actions">
+              <a
+                class="icon-btn"
+                href="{% url 'ventes:vente_detail' v.pk %}"
+                title="Voir le détail"
+              >
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  />
+
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="2.6"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  />
+                </svg>
+              </a>
+            </div>
+          </td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <p>
+                <strong>Aucune vente enregistrée pour l'instant.</strong>
+              </p>
+            </div>
+          </td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
   {% include "core/pagination.html" with hx_target="#vente-table-wrap" %}
 </div>

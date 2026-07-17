@@ -1,14 +1,51 @@
+import io
 import random
 from datetime import timedelta, date
 
+from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from PIL import Image, ImageDraw, ImageFont
 
 from accounts.models import Utilisateur
 from produits.models import Categorie, Produit
 from tiers.models import Client, Fournisseur
 from core.services import creer_achat, creer_vente
 from facturation.models import Reglement
+
+
+# Palette cohérente avec le design system (une couleur par catégorie, cycle si besoin)
+PALETTE_IMAGES = ["#B4602E", "#1C1A17", "#3E7A52", "#35618A", "#984E23", "#7C766B"]
+
+
+def generer_image_produit(designation, index_categorie):
+    """
+    Génère une vignette placeholder (aucune dépendance réseau) : fond coloré selon la
+    catégorie + initiales du produit, dans le même esprit graphique que l'application.
+    Retourne un ContentFile PNG prêt à être assigné à Produit.image.
+    """
+    couleur = PALETTE_IMAGES[index_categorie % len(PALETTE_IMAGES)]
+    img = Image.new("RGB", (480, 480), couleur)
+    draw = ImageDraw.Draw(img)
+
+    mots = designation.split()
+    initiales = "".join(m[0] for m in mots[:2]).upper()
+
+    try:
+        police = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 160)
+    except OSError:
+        police = ImageFont.load_default()
+
+    bbox = draw.textbbox((0, 0), initiales, font=police)
+    largeur_texte = bbox[2] - bbox[0]
+    hauteur_texte = bbox[3] - bbox[1]
+    position = ((480 - largeur_texte) / 2 - bbox[0], (480 - hauteur_texte) / 2 - bbox[1])
+    draw.text(position, initiales, fill="#FBF9F4", font=police)
+
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    return ContentFile(buffer.read(), name=f"{initiales.lower()}-{random.randint(1000,9999)}.png")
 
 
 NOMS = ["Ondo", "Mba", "Nzue", "Obame", "Ella", "Moussavou", "Ndong", "Ovono", "Boukandou", "Mengue",
@@ -112,6 +149,12 @@ class Command(BaseCommand):
                     seuil_alerte=seuil, taux_tva=0.18,
                 )
             )
+            if cree and not produit.image:
+                produit.image.save(
+                    f"{ref}.png",
+                    generer_image_produit(designation, cat_idx),
+                    save=True,
+        )
             produits.append(produit)
         # Créer volontairement quelques ruptures / alertes pour la démo
         for p in produits[:2]:

@@ -1,29 +1,180 @@
-<div class="entity-grid">
-  {% for cat in page_obj %}
-  <div class="entity-card">
-    <div class="entity-card__actions">
-      <button class="icon-btn" title="Modifier" hx-get="{% url 'produits:categorie_modifier' cat.pk %}" hx-target="#modal-root"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
-      <button class="icon-btn" title="Désactiver" hx-get="{% url 'produits:categorie_supprimer' cat.pk %}" hx-target="#modal-root"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    </div>
-    <div class="entity-card__head">
-      <span class="entity-card__avatar">{{ cat.libelle|slice:":2"|upper }}</span>
-      <div>
-        <div class="entity-card__name">{{ cat.libelle }}</div>
-        <div class="entity-card__meta">{{ cat.nb_produits }} produit{{ cat.nb_produits|pluralize }}</div>
+<div x-data>
+  <!-- =========================
+     Vue grille
+========================= -->
+  <div class="entity-grid" x-show="$store.vue.mode === 'grid'" x-cloak>
+    {% for cat in page_obj %}
+
+    <div class="entity-card">
+      <div class="entity-card__actions">
+        <button
+          class="icon-btn"
+          title="Modifier"
+          hx-get="{% url 'produits:categorie_modifier' cat.pk %}"
+          hx-target="#modal-root"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 20h4l11-11-4-4L4 16v4Z"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
+        <button
+          class="icon-btn"
+          title="Désactiver"
+          hx-get="{% url 'produits:categorie_supprimer' cat.pk %}"
+          hx-target="#modal-root"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div class="entity-card__head">
+        <span class="entity-card__avatar">
+          {{ cat.libelle|slice:":2"|upper }}
+        </span>
+
+        <div>
+          <div class="entity-card__name">{{ cat.libelle }}</div>
+
+          <div class="entity-card__meta">
+            {{ cat.nb_produits }} produit{{ cat.nb_produits|pluralize }}
+          </div>
+        </div>
+      </div>
+
+      <div class="entity-card__rows">
+        <div class="entity-card__row">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 6h16M4 12h16M4 18h10"
+              stroke="currentColor"
+              stroke-width="1.4"
+            />
+          </svg>
+
+          {{ cat.description|truncatechars:70|default:"Aucune description renseignée" }}
+        </div>
+      </div>
+
+      <div class="entity-card__footer">
+        {% if cat.est_active %}
+        <span class="badge badge--vert">Active</span>
+        {% else %}
+        <span class="badge badge--gris">Inactive</span>
+        {% endif %}
       </div>
     </div>
-    <div class="entity-card__rows">
-      <div class="entity-card__row">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.4"/></svg>
-        {{ cat.description|truncatechars:70|default:"Aucune description renseignée" }}
-      </div>
+
+    {% empty %}
+
+    <div class="empty-state" style="grid-column: 1/-1">
+      <p><strong>Aucune catégorie pour l'instant.</strong></p>
     </div>
-    <div class="entity-card__footer">
-      {% if cat.est_active %}<span class="badge badge--vert">Active</span>{% else %}<span class="badge badge--gris">Inactive</span>{% endif %}
-    </div>
+
+    {% endfor %}
   </div>
-  {% empty %}
-  <div class="empty-state" style="grid-column:1/-1;"><p><strong>Aucune catégorie pour l'instant.</strong></p></div>
-  {% endfor %}
+
+  <!-- =========================
+     Vue tableau
+========================= -->
+
+  <div class="table-wrap" x-show="$store.vue.mode === 'table'" x-cloak>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Description</th>
+          <th>Produits</th>
+          <th>Statut</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for cat in page_obj %}
+
+        <tr>
+          <td class="cell-primary">{{ cat.libelle }}</td>
+
+          <td class="cell-muted">
+            {{ cat.description|truncatechars:70|default:"Aucune description renseignée" }}
+          </td>
+
+          <td>{{ cat.nb_produits }} produit{{ cat.nb_produits|pluralize }}</td>
+
+          <td>
+            {% if cat.est_active %}
+            <span class="badge badge--vert">Active</span>
+            {% else %}
+            <span class="badge badge--gris">Inactive</span>
+            {% endif %}
+          </td>
+
+          <td>
+            <div class="row-actions">
+              <button
+                class="icon-btn"
+                title="Modifier"
+                hx-get="{% url 'produits:categorie_modifier' cat.pk %}"
+                hx-target="#modal-root"
+              >
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4 20h4l11-11-4-4L4 16v4Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+
+              <button
+                class="icon-btn"
+                title="Désactiver"
+                hx-get="{% url 'produits:categorie_supprimer' cat.pk %}"
+                hx-target="#modal-root"
+              >
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+          <td colspan="5">
+            <div class="empty-state">
+              <p><strong>Aucune catégorie pour l'instant.</strong></p>
+            </div>
+          </td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "core/pagination.html" with hx_target="#categorie-table-wrap" %}
 </div>
-{% include "core/pagination.html" with hx_target="#categorie-table-wrap" %}

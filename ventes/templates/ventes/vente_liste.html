@@ -23,6 +23,7 @@
       <option value="ANNULEE" {% if statut == "ANNULEE" %}selected{% endif %}>Annulée</option>
     </select>
   </div>
+  {% include "core/_vue_toggle.html" %}
 </div>
 <div id="vente-table-wrap">{% include "ventes/_vente_table.html" %}</div>
 {% endblock %}

@@ -10,6 +10,10 @@
 </head>
 <body>
 <div class="login-page">
+  <span class="login-page__orb login-page__orb--1"></span>
+  <span class="login-page__orb login-page__orb--2"></span>
+  <span class="login-page__orb login-page__orb--3"></span>
+
   <div class="login-card glass-panel">
     <div class="login-card__mark">GC</div>
     <h1>Bon retour</h1>
@@ -17,8 +21,20 @@
     {% if form.errors %}<p class="error-text" style="margin-bottom:14px;">Identifiants incorrects. Veuillez réessayer.</p>{% endif %}
     <form method="post">
       {% csrf_token %}
-      <div class="form-field" style="margin-bottom:14px;"><label>Nom d'utilisateur</label>{{ form.username }}</div>
-      <div class="form-field" style="margin-bottom:18px;"><label>Mot de passe</label>{{ form.password }}</div>
+      <div class="form-field" style="margin-bottom:14px;">
+        <label>Nom d'utilisateur</label>
+        <div class="field-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z" stroke="currentColor" stroke-width="1.6"/><path d="M4 20.5c1.5-4 4.8-6 8-6s6.5 2 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          {{ form.username }}
+        </div>
+      </div>
+      <div class="form-field" style="margin-bottom:22px;">
+        <label>Mot de passe</label>
+        <div class="field-icon">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9.5" rx="2.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          {{ form.password }}
+        </div>
+      </div>
       <button type="submit" class="btn btn-primary" style="width:100%;">Se connecter</button>
     </form>
   </div>

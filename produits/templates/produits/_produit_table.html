@@ -1,5 +1,6 @@
 {% load core_extras %}
-<div class="product-grid">
+<div x-data>
+<div class="product-grid" x-show="$store.vue.mode === 'grid'" x-cloak>
   {% for produit in page_obj %}
   <div class="product-card">
     <div class="product-card__media">
@@ -17,12 +18,18 @@
         {% else %}<span class="badge badge--vert">En stock</span>{% endif %}
       </span>
       <div class="product-card__actions">
-        <button class="icon-btn" hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" title="Modifier">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="icon-btn" title="Supprimer" hx-get="{% url 'produits:produit_supprimer' produit.pk %}" hx-target="#modal-root">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+         {% if produit.est_actif %}
+  <button class="icon-btn" hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" title="Modifier">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="icon-btn" title="Désactiver" hx-get="{% url 'produits:produit_supprimer' produit.pk %}" hx-target="#modal-root">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  {% else %}
+  <button class="icon-btn" title="Réactiver" hx-get="{% url 'produits:produit_reactiver' produit.pk %}" hx-target="#modal-root">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.6 5.9M4 12V6m0 6h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  {% endif %}
       </div>
     </div>
     <div class="product-card__body">
@@ -44,4 +51,57 @@
   </div>
   {% endfor %}
 </div>
+
+<div class="table-wrap" x-show="$store.vue.mode === 'table'" x-cloak>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Référence</th><th>Désignation</th><th>Catégorie</th><th>Prix vente</th><th>Stock</th><th>Statut</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for produit in page_obj %}
+      <tr>
+        <td class="cell-muted">{{ produit.reference }}</td>
+        <td class="cell-primary"><a href="{% url 'produits:produit_detail' produit.pk %}">{{ produit.designation }}</a></td>
+        <td>{{ produit.categorie.libelle }}</td>
+        <td>{{ produit.prix_vente|fcfa }}</td>
+        <td>{{ produit.quantite_stock }} {{ produit.get_unite_mesure_display }}</td>
+        <td>
+          {% if not produit.est_actif %}<span class="badge badge--gris">Inactif</span>
+          {% elif produit.en_rupture %}<span class="badge badge--rouge">Rupture</span>
+          {% elif produit.proche_seuil %}<span class="badge badge--cuivre">Seuil bas</span>
+          {% else %}<span class="badge badge--vert">En stock</span>{% endif %}
+        </td>
+        <td>
+          <div class="row-actions">
+          <div class="row-actions">
+              {% if produit.est_actif %}
+              <button class="icon-btn" hx-get="{% url 'produits:produit_modifier' produit.pk %}" hx-target="#modal-root" title="Modifier">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l11-11-4-4L4 16v4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="icon-btn" title="Désactiver" hx-get="{% url 'produits:produit_supprimer' produit.pk %}" hx-target="#modal-root">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              {% else %}
+              <button class="icon-btn" title="Réactiver" hx-get="{% url 'produits:produit_reactiver' produit.pk %}" hx-target="#modal-root">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.6 5.9M4 12V6m0 6h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              {% endif %}
+            </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" stroke="currentColor" stroke-width="1.4"/></svg>
+          <p><strong>Aucun produit trouvé</strong></p><p>Essayez un autre mot-clé ou créez une nouvelle référence.</p>
+        </div>
+      </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
 {% include "core/pagination.html" with hx_target="#produit-table-wrap" %}
+</div>

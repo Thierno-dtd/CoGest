@@ -115,6 +115,17 @@ def produit_supprimer(request, pk):
     return render(request, 'produits/_confirmer_suppression.html', {'objet': produit, 'url_annuler': 'produits:produit_detail'})
 
 
+@login_required
+@role_requis('peut_administrer', 'peut_gerer_stock')
+def produit_reactiver(request, pk):
+    produit = get_object_or_404(Produit, pk=pk)
+    if request.method == 'POST':
+        produit.est_actif = True
+        produit.save(update_fields=['est_actif'])
+        messages.success(request, f"Le produit « {produit.designation} » a été réactivé.")
+        return reponse_suppression(request, 'produits:produit_liste')
+    return render(request, 'produits/_confirmer_reactivation.html', {'objet': produit})
+
 # --- Catégories ---
 
 @login_required

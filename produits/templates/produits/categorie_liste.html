@@ -19,6 +19,7 @@
            hx-get="{% url 'produits:categorie_liste' %}" hx-trigger="keyup changed delay:350ms, search"
            hx-target="#categorie-table-wrap" hx-push-url="true">
   </div>
+  {% include "core/_vue_toggle.html" %}
 </div>
 <div id="categorie-table-wrap">{% include "produits/_categorie_table.html" %}</div>
 {% endblock %}
